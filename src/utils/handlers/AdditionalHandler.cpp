@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -509,6 +509,7 @@ AdditionalHandler::parseSumoBaseObject(CommonXMLStructure::SumoBaseObject* obj) 
                           obj->getDoubleAttribute(SUMO_ATTR_PROB),
                           obj->getStringAttribute(SUMO_ATTR_NAME),
                           obj->getBoolAttribute(SUMO_ATTR_OFF),
+                          obj->getBoolAttribute(SUMO_ATTR_OPTIONAL),
                           obj->getTimeAttribute(SUMO_ATTR_HALTING_TIME_THRESHOLD),
                           obj->getStringListAttribute(SUMO_ATTR_VTYPES),
                           obj->getParameters());
@@ -1717,7 +1718,7 @@ AdditionalHandler::parsePOIAttributes(const SUMOSAXAttributes& attrs) {
     // check that lane and pos are defined together
     if ((attrs.hasAttribute(SUMO_ATTR_LANE) && !attrs.hasAttribute(SUMO_ATTR_POSITION)) ||
             (!attrs.hasAttribute(SUMO_ATTR_LANE) && attrs.hasAttribute(SUMO_ATTR_POSITION))) {
-        writeError(TL("lane and position must be be defined together in POIs"));
+        writeError(TL("lane and position must be defined together in POIs"));
         parsedOk = false;
     }
     // check that lon and lat are defined together

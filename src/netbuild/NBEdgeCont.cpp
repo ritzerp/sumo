@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -1443,6 +1443,53 @@ NBEdgeCont::guessRoundabouts() {
 }
 
 
+int
+NBEdgeCont::extractRoundabouts() {
+    std::set<NBEdge*> candidateEdges;
+    for (const auto& edge : myEdges) {
+        NBEdge* const e = edge.second;
+        if (e->getJunctionPriority(e->getToNode()) == NBEdge::JunctionPriority::ROUNDABOUT || e->getJunctionPriority(e->getFromNode()) == NBEdge::JunctionPriority::ROUNDABOUT) {
+            candidateEdges.insert(e);
+        }
+    }
+    std::set<NBEdge*> visited;
+    int extracted = 0;
+    for (const auto& edgeIt : candidateEdges) {
+        EdgeVector loopEdges;
+        NBEdge* e = edgeIt;
+        if (visited.count(e) > 0) {
+            // already seen
+            continue;
+        }
+        loopEdges.push_back(e);
+        bool doLoop = true;
+        //
+        do {
+            if (std::find(visited.begin(), visited.end(), e) != visited.end()) {
+                if (loopEdges.size() > 1) {
+                    addRoundabout(EdgeSet(loopEdges.begin(), loopEdges.end()));
+                    ++extracted;
+                }
+                doLoop = false;
+                break;
+            }
+            visited.insert(e);
+            loopEdges.push_back(e);
+            const EdgeVector& outgoingEdges = e->getToNode()->getOutgoingEdges();
+            EdgeVector::const_iterator me = std::find_if(outgoingEdges.begin(), outgoingEdges.end(), [](const NBEdge * outgoingEdge) {
+                return outgoingEdge->getJunctionPriority(outgoingEdge->getToNode()) == NBEdge::JunctionPriority::ROUNDABOUT;
+            });
+            if (me == outgoingEdges.end()) { // no closed loop
+                doLoop = false;
+            } else {
+                e = *me;
+            }
+        } while (doLoop);
+    }
+    return extracted;
+}
+
+
 double
 NBEdgeCont::formFactor(const EdgeVector& loopEdges) {
     PositionVector points;
@@ -1826,18 +1873,22 @@ NBEdgeCont::joinTramEdges(NBDistrictCont& dc, NBPTStopCont& sc, NBPTLineCont& lc
     // {targetEdge, laneIndex : tramEdge}
     std::map<std::pair<NBEdge*, int>, NBEdge*, MinLaneComparatorIdLess> matches;
 
-    for (NBEdge* edge : targetEdges) {
+    for (NBEdge* const edge : targetEdges) {
         Boundary bound = edge->getGeometry().getBoxBoundary();
         bound.grow(maxDist + edge->getTotalWidth());
         float min[2] = { static_cast<float>(bound.xmin()), static_cast<float>(bound.ymin()) };
         float max[2] = { static_cast<float>(bound.xmax()), static_cast<float>(bound.ymax()) };
-        std::set<const Named*> nearby;
-        Named::StoringVisitor visitor(nearby);
+        std::set<const Named*> near;
+        Named::StoringVisitor visitor(near);
         tramTree.Search(min, max, visitor);
-        for (const Named* namedEdge : nearby) {
+        // the nearby set is actually just re-sorting according to the id to make the tests comparable
+        std::set<NBEdge*, ComparatorIdLess> nearby;
+        for (const Named* namedEdge : near) {
+            nearby.insert(const_cast<NBEdge*>(static_cast<const NBEdge*>(namedEdge)));
+        }
+        for (NBEdge* const tramEdge : nearby) {
             // find a continous stretch of tramEdge that runs along one of the
             // lanes of the road edge
-            NBEdge* tramEdge = const_cast<NBEdge*>(dynamic_cast<const NBEdge*>(namedEdge));
             const PositionVector& tramShape = tramEdge->getGeometry();
             double minEdgeDist = maxDist + 1;
             int minLane = -1;

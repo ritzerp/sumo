@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -25,7 +25,7 @@
 #include <netedit/frames/GNEDemandSelector.h>
 #include <netedit/frames/GNEElementTree.h>
 #include <netedit/frames/GNEFrame.h>
-#include <netedit/frames/GNEPathLegendModule.h>
+#include <netedit/frames/GNEPlanCreatorLegend.h>
 #include <netedit/frames/GNETagSelector.h>
 #include <netedit/frames/GNEPlanSelector.h>
 #include <netedit/frames/GNEPlanCreator.h>
@@ -57,10 +57,10 @@ public:
     void hide();
 
     /**@brief add container plan element
-     * @param objectsUnderCursor collection of objects under cursor after click over view
+     * @param viewObjects collection of objects under cursor after click over view
      * @return true if element was successfully added
      */
-    bool addContainerPlanElement(const GNEViewNetHelper::ObjectsUnderCursor& objectsUnderCursor);
+    bool addContainerPlanElement(const GNEViewNetHelper::ViewObjectsSelector& viewObjects);
 
     /// @brief reset selected container
     void resetSelectedContainer();
@@ -106,6 +106,6 @@ private:
     /// @brief Container Hierarchy
     GNEElementTree* myContainerHierarchy;
 
-    /// @brief path legend modul
-    GNEPathLegendModule* myPathLegend;
+    /// @brief plan creator legend
+    GNEPlanCreatorLegend* myPlanCreatorLegend;
 };

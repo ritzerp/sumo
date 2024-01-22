@@ -74,19 +74,19 @@ distinct shape file.
 |--------|-------------|
 | **-n** {{DT_FILE}}<br> **--net-file** {{DT_FILE}} | Loads SUMO-network FILE as reference to offset and projection |
 | **--dlr-navteq-poly-files** {{DT_FILE}} | Reads polygons from FILE assuming they're coded in DLR-Navteq (Elmar)-format |
-| **--dlr-navteq-poi-files** {{DT_FILE}} | Reads pois from FILE+ assuming they're coded in DLR-Navteq (Elmar)-format |
+| **--dlr-navteq-poi-files** {{DT_FILE}} | Reads pois from FILE assuming they're coded in DLR-Navteq (Elmar)-format |
 | **--visum-files** {{DT_FILE}} | Reads polygons from FILE assuming it's a Visum-net |
 | **--visum.language-file** {{DT_FILE}} | Load language mappings from FILE |
 | **--xml-files** {{DT_FILE}} | Reads pois and shapes from FILE assuming they're coded in XML |
-| **--osm-files** {{DT_FILE}} | Reads pois from FILE+ assuming they're coded in OSM |
+| **--osm-files** {{DT_FILE}} | Reads pois from FILE assuming they're coded in OSM |
 | **--osm.keep-full-type** {{DT_BOOL}} | The type will be made of the key-value - pair; *default:* **false** |
 | **--osm.use-name** {{DT_BOOL}} | The id will be set from the given 'name' attribute; *default:* **false** |
 | **--osm.merge-relations** {{DT_FLOAT}} | If FLOAT >= 0, assemble one polygon from all ways of a relation if they all connect with gaps below FLOAT; *default:* **-1** |
-| **--shapefile-prefixes** {{DT_FILE}} | Reads shapes from shapefiles FILE+ |
+| **--shapefile-prefixes** {{DT_FILE}} | Reads shapes from shapefiles FILE |
 | **--shapefile.guess-projection** {{DT_BOOL}} | Guesses the shapefile's projection; *default:* **false** |
 | **--shapefile.traditional-axis-mapping** {{DT_BOOL}} | Use traditional axis order (lon, lat); *default:* **false** |
 | **--shapefile.id-column** {{DT_STR}} | Defines in which column the id can be found |
-| **--shapefile.type-columns** {{DT_STR[]}} | Defines which columns form the type id (comma separated list) |
+| **--shapefile.type-columns** {{DT_STR_LIST}} | Defines which columns form the type id (comma separated list) |
 | **--shapefile.use-running-id** {{DT_BOOL}} | A running number will be used as id; *default:* **false** |
 | **--shapefile.add-param** {{DT_BOOL}} | Extract all additional columns as params; *default:* **false** |
 | **--shapefile.fill** {{DT_STR}} | [auto,true,false]. Forces the 'fill' status to the given value. Default 'auto' tries to determine it from the data type |
@@ -141,7 +141,7 @@ this boundary are discarded in these cases.
 | **--prune.in-net.offsets** {{DT_STR}} | Uses FLOAT,FLOAT,FLOAT,FLOAT as offset definition added to the net boundary. Positive values grow the boundary on all sides while negative values shrink it.; *default:* **0,0,0,0** |
 | **--prune.boundary** {{DT_STR}} | Uses STR as pruning boundary |
 | **--prune.keep-list** {{DT_STR}} | Items in STR will be kept though out of boundary |
-| **--prune.explicit** {{DT_STR[]}} | Items with names in STR[] will be removed |
+| **--prune.explicit** {{DT_STR_LIST}} | Items with names in STR[] will be removed |
 
 ### Processing
 

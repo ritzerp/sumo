@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2014-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2014-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -49,6 +49,9 @@ public:
     SUMOTime execute(SUMOTime time);
 
     bool usingInternalLanes() override;
+    bool usingShortcuts() override {
+        return myHaveAdditionalWalkableAreas;
+    }
     void registerArrived();
     int getActiveNumber() override;
     void clearState() override;
@@ -75,6 +78,8 @@ private:
         PState(MSPerson* person, MSStageMoving* stage, JPS_JourneyDescription journey, JPS_JourneyId journeyId, JPS_StageId stageId, const PositionVector& waypoints);
         ~PState() override;
 
+        void reinit(MSStageMoving* stage, JPS_JourneyDescription journey, JPS_JourneyId journeyId, JPS_StageId stageId, const PositionVector& waypoints);
+
         Position getPosition(const MSStageMoving& stage, SUMOTime now) const override;
         void setPosition(double x, double y);
 
@@ -84,8 +89,10 @@ private:
         double getAngle(const MSStageMoving& stage, SUMOTime now) const override;
         void setAngle(double angle);
 
-        MSStageMoving* getStage();
-        MSPerson* getPerson();
+        MSStageMoving* getStage() const;
+        void setStage(MSStageMoving* const stage);
+
+        MSPerson* getPerson() const;
 
         void setLanePosition(double lanePosition);
         double getEdgePos(const MSStageMoving& stage, SUMOTime now) const override;
@@ -150,7 +157,7 @@ private:
     std::vector<PState*> myPedestrianStates;
 
     GEOSGeometry* myGEOSPedestrianNetwork;
-    bool myIsPedestrianNetworkConnected;
+    bool myHaveAdditionalWalkableAreas;
 
     JPS_GeometryBuilder myJPSGeometryBuilder;
     JPS_Geometry myJPSGeometry;
@@ -161,16 +168,17 @@ private:
     static const int GEOS_QUADRANT_SEGMENTS;
     static const double GEOS_MITRE_LIMIT;
     static const double GEOS_MIN_AREA;
+    static const double GEOS_BUFFERED_SEGMENT_WIDTH;
 
     void initialize();
-    void tryPedestrianInsertion(PState* state);
-    bool addWaypoint(JPS_JourneyDescription journey, JPS_StageId& predecessor, const Position& point);
+    void tryPedestrianInsertion(PState* state, const Position& p);
+    bool addWaypoint(JPS_JourneyDescription journey, JPS_StageId& predecessor, const Position& point, const std::string& agentID);
     static MSLane* getNextPedestrianLane(const MSLane* const currentLane);
     static const Position& getAnchor(const MSLane* const lane, const MSEdge* const edge, MSEdgeVector incoming);
     static const MSEdgeVector getAdjacentEdgesOfEdge(const MSEdge* const edge);
     static const MSEdge* getWalkingAreaInbetween(const MSEdge* const edge, const MSEdge* const otherEdge);
     static GEOSGeometry* createGeometryFromCenterLine(PositionVector centerLine, double width, int capStyle);
-    static GEOSGeometry* createGeometryFromShape(PositionVector shape);
+    static GEOSGeometry* createGeometryFromShape(PositionVector shape, std::string shapeID, bool isInternalShape = false);
     static GEOSGeometry* createGeometryFromAnchors(const Position& anchor, const MSLane* const lane, const Position& otherAnchor, const MSLane* const otherLane);
     GEOSGeometry* buildPedestrianNetwork(MSNet* network);
     static PositionVector getCoordinates(const GEOSGeometry* geometry);

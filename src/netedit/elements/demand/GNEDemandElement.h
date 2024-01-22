@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -58,13 +58,14 @@ public:
 
     /// @brief enum class for demandElement problems
     enum class Problem {
-        OK,                     // There is no problem
-        INVALID_ELEMENT,        // Element is invalid (for example, a route without edges)
-        INVALID_PATH,           // Path (route, trip... ) is not valid (i.e is empty)
-        DISCONNECTED_PLAN,      // Plan element (person, containers) is not connected with the previous or next plan
-        INVALID_STOPPOSITION,   // StopPosition is invalid (only used in stops over edges or lanes
-        STOP_DOWNSTREAM,        // Stops don't follow their route parent
-        NO_PLANS                // Person or container doesn't have a plan
+        OK,                         // There is no problem
+        INVALID_ELEMENT,            // Element is invalid (for example, a route without edges)
+        INVALID_PATH,               // Path (route, trip... ) is not valid (i.e is empty)
+        DISCONNECTED_PLAN,          // Plan element (person, containers) is not connected with the previous or next plan
+        INVALID_STOPPOSITION,       // StopPosition is invalid (only used in stops over edges or lanes
+        STOP_DOWNSTREAM,            // Stops don't follow their route parent
+        REPEATEDROUTE_DISCONNECTED, // Repeated route is disconnected
+        NO_PLANS                    // Person or container doesn't have a plan
     };
 
     /**@brief Constructor
@@ -122,6 +123,9 @@ public:
 
     /// @brief get GUIGlObject associated with this AttributeCarrier
     GUIGlObject* getGUIGlObject();
+
+    /// @brief get GUIGlObject associated with this AttributeCarrier (constant)
+    const GUIGlObject* getGUIGlObject() const;
 
     /// @brief get demand element geometry (stacked)
     const GUIGeometry& getDemandElementGeometry();
@@ -213,6 +217,9 @@ public:
     /// @brief check if draw select contour (blue)
     bool checkDrawSelectContour() const;
 
+    /// @brief check if draw move contour (red)
+    bool checkDrawMoveContour() const;
+
     /// @}
 
     /// @name inherited from GUIGlObject
@@ -243,7 +250,7 @@ public:
     virtual void drawGL(const GUIVisualizationSettings& s) const = 0;
 
     /// @brief check if element is locked
-    bool isGLObjectLocked();
+    bool isGLObjectLocked() const;
 
     /// @brief mark element as front element
     void markAsFrontElement();

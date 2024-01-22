@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -53,7 +53,10 @@ MSStageWaiting::~MSStageWaiting() {}
 
 MSStage*
 MSStageWaiting::clone() const {
-    return new MSStageWaiting(myDestination, myDestinationStop, myWaitingDuration, myWaitingUntil, myArrivalPos, myActType, myType == MSStageType::WAITING_FOR_DEPART);
+    MSStage* const clon = new MSStageWaiting(myDestination, myDestinationStop, myWaitingDuration, myWaitingUntil, myArrivalPos,
+            myActType, myType == MSStageType::WAITING_FOR_DEPART);
+    clon->setParameters(*this);
+    return clon;
 }
 
 SUMOTime
@@ -212,4 +215,3 @@ MSStageWaiting::loadState(MSTransportable* transportable, std::istringstream& st
         }
     }
 }
-

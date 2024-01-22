@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2007-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2007-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -28,6 +28,7 @@
 #include <set>
 #include <random>
 #include <microsim/MSMoveReminder.h>
+#include <microsim/MSNet.h>
 #include <microsim/MSVehicleType.h>
 #include <microsim/MSVehicleControl.h>
 #include <utils/common/Named.h>
@@ -229,13 +230,13 @@ MSDevice::equippedByDefaultAssignmentOptions(const OptionsCont& oc, const std::s
     bool haveByParameter = false;
     bool parameterGiven = false;
     const std::string key = "has." + deviceName + ".device";
-    if (v.getParameter().knowsParameter(key)) {
+    if (v.getParameter().hasParameter(key)) {
         parameterGiven = true;
         haveByParameter = StringUtils::toBool(v.getParameter().getParameter(key, "false"));
-    } else if (v.getVehicleType().getParameter().knowsParameter(key)) {
+    } else if (v.getVehicleType().getParameter().hasParameter(key)) {
         parameterGiven = true;
         haveByParameter = StringUtils::toBool(v.getVehicleType().getParameter().getParameter(key, "false"));
-    } else if (v.getVehicleType().getParameter().knowsParameter(prefix + ".probability")) {
+    } else if (v.getVehicleType().getParameter().hasParameter(prefix + ".probability")) {
         // override global options
         numberGiven = true;
         haveByNumber = RandHelper::rand(&myEquipmentRNG) < StringUtils::toDouble(v.getVehicleType().getParameter().getParameter(prefix + ".probability", "0"));

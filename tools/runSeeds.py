@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-# Copyright (C) 2008-2023 German Aerospace Center (DLR) and others.
+# Copyright (C) 2008-2024 German Aerospace Center (DLR) and others.
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License 2.0 which is available at
 # https://www.eclipse.org/legal/epl-2.0/
@@ -44,7 +44,7 @@ def get_options(args=None):
     ap.add_option("-k", "--configuration", category="input", metavar="FILE", required=True,
                   type=ap.sumoconfig_file_list,
                   help="configuration to run or comma-separated list of configurations")
-    ap.add_option("-a", "--application", category="processing", default="sumo", metavar="FILE",
+    ap.add_option("-a", "--application", category="processing", default=sumolib.checkBinary("sumo"), metavar="FILE",
                   help="application to run or comma-separated list of applications")
     ap.add_option("-p", "--output-prefix",  category="processing", default="SEED.", dest="prefix",
                   help="output prefix",)

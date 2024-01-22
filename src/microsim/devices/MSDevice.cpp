@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2013-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2013-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -25,6 +25,8 @@
 #include <microsim/MSVehicle.h>
 #include <microsim/transportables/MSTransportable.h>
 #include <microsim/MSVehicleControl.h>
+#include <microsim/MSEdge.h>
+
 #include "MSDevice.h"
 #include "MSDevice_Vehroutes.h"
 #include "MSDevice_Tripinfo.h"
@@ -174,9 +176,9 @@ MSDevice::loadState(const SUMOSAXAttributes& /* attrs */) {
 std::string
 MSDevice::getStringParam(const SUMOVehicle& v, const OptionsCont& oc, const std::string& paramName, const std::string& deflt, bool required) {
     const std::string key = "device." + paramName;
-    if (v.getParameter().knowsParameter(key)) {
+    if (v.getParameter().hasParameter(key)) {
         return v.getParameter().getParameter(key, "");
-    } else if (v.getVehicleType().getParameter().knowsParameter(key)) {
+    } else if (v.getVehicleType().getParameter().hasParameter(key)) {
         return v.getVehicleType().getParameter().getParameter(key, "");
     } else {
         if (oc.exists(key) && oc.isSet(key)) {

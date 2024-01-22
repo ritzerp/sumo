@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -536,15 +536,16 @@ NLTriggerBuilder::addAccess(MSNet& /* net */, const SUMOSAXAttributes& attrs) {
     // get the positions
     bool ok = true;
     const bool random = attrs.getOpt<std::string>(SUMO_ATTR_POSITION, "access", ok) == "random";
-    double startPos = random ? 0. : attrs.getOpt<double>(SUMO_ATTR_POSITION, "access", ok, 0);
-    double endPos = random ? lane->getLength() : startPos;
+    const bool useDoors = attrs.getOpt<std::string>(SUMO_ATTR_POSITION, "access", ok) == "doors";
+    double startPos = random || useDoors ? 0. : attrs.getOpt<double>(SUMO_ATTR_POSITION, "access", ok, 0);
+    double endPos = random || useDoors ? lane->getLength() : startPos;
     const double length = attrs.getOpt<double>(SUMO_ATTR_LENGTH, "access", ok, -1);
     const bool friendlyPos = attrs.getOpt<bool>(SUMO_ATTR_FRIENDLY_POS, "access", ok, false);
     if (!ok || (myHandler->checkStopPos(startPos, endPos, lane->getLength(), 0, friendlyPos) != SUMORouteHandler::StopPos::STOPPOS_VALID)) {
         throw InvalidArgument("Invalid position " + attrs.getString(SUMO_ATTR_POSITION) + " for access on lane '" + lane->getID() + "' in stop '" + myCurrentStop->getID() + "'.");
     }
     // add bus stop access
-    if (!myCurrentStop->addAccess(lane, startPos, endPos, length)) {
+    if (!myCurrentStop->addAccess(lane, startPos, endPos, length, useDoors)) {
         throw InvalidArgument("Duplicate access on lane '" + lane->getID() + "' for stop '" + myCurrentStop->getID() + "'");
     }
 }
@@ -696,14 +697,29 @@ NLTriggerBuilder::parseAndBuildRerouter(MSNet& net, const SUMOSAXAttributes& att
     if (edges.size() == 0) {
         throw InvalidArgument("No edges found for rerouter '" + id + "'.");
     }
-    double prob = attrs.getOpt<double>(SUMO_ATTR_PROB, id.c_str(), ok, 1);
-    bool off = attrs.getOpt<bool>(SUMO_ATTR_OFF, id.c_str(), ok, false);
-    SUMOTime timeThreshold = TIME2STEPS(attrs.getOpt<double>(SUMO_ATTR_HALTING_TIME_THRESHOLD, id.c_str(), ok, 0));
+    const double prob = attrs.getOpt<double>(SUMO_ATTR_PROB, id.c_str(), ok, 1);
+    const bool off = attrs.getOpt<bool>(SUMO_ATTR_OFF, id.c_str(), ok, false);
+    const bool optional = attrs.getOpt<bool>(SUMO_ATTR_OPTIONAL, id.c_str(), ok, false);
+    const SUMOTime timeThreshold = TIME2STEPS(attrs.getOpt<double>(SUMO_ATTR_HALTING_TIME_THRESHOLD, id.c_str(), ok, 0));
     const std::string vTypes = attrs.getOpt<std::string>(SUMO_ATTR_VTYPES, id.c_str(), ok, "");
+    const std::string pos = attrs.getOpt<std::string>(SUMO_ATTR_POSITION, id.c_str(), ok, "");
+    Position p = Position::INVALID;
+    if (pos != "") {
+        const std::vector<std::string> posSplit = StringTokenizer(pos, ",").getVector();
+        if (posSplit.size() == 1) {
+            p = edges.front()->getLanes()[0]->geometryPositionAtOffset(StringUtils::toDouble(posSplit[0]));
+        } else if (posSplit.size() == 2) {
+            p = Position(StringUtils::toDouble(posSplit[0]), StringUtils::toDouble(posSplit[1]));
+        } else if (posSplit.size() == 3) {
+            p = Position(StringUtils::toDouble(posSplit[0]), StringUtils::toDouble(posSplit[1]), StringUtils::toDouble(posSplit[2]));
+        } else {
+            throw InvalidArgument("Invalid position for rerouter '" + id + "'.");
+        }
+    }
     if (!ok) {
         throw InvalidArgument("Could not parse rerouter '" + id + "'.");
     }
-    MSTriggeredRerouter* trigger = buildRerouter(net, id, edges, prob, off, timeThreshold, vTypes);
+    MSTriggeredRerouter* trigger = buildRerouter(net, id, edges, prob, off, optional, timeThreshold, vTypes, p);
     // read in the trigger description
     trigger->registerParent(SUMO_TAG_REROUTER, myHandler);
 }
@@ -751,9 +767,9 @@ NLTriggerBuilder::buildCalibrator(MSNet& /*net*/, const std::string& id,
 
 MSTriggeredRerouter*
 NLTriggerBuilder::buildRerouter(MSNet&, const std::string& id,
-                                MSEdgeVector& edges, double prob, bool off,
-                                SUMOTime timeThreshold, const std::string& vTypes) {
-    return new MSTriggeredRerouter(id, edges, prob, off, timeThreshold, vTypes);
+                                MSEdgeVector& edges, double prob, bool off, bool optional,
+                                SUMOTime timeThreshold, const std::string& vTypes, const Position& pos) {
+    return new MSTriggeredRerouter(id, edges, prob, off, optional, timeThreshold, vTypes, pos);
 }
 
 

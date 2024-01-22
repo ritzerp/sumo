@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -39,6 +39,7 @@ class GNETagProperties {
 
 public:
 
+    /// @brief tag types
     enum TagType {
         // basic types
         NETWORKELEMENT =    1 << 0,  // Network elements (Edges, Junctions, Lanes...)
@@ -77,60 +78,73 @@ public:
         GENERICDATA =       1 << 28, // Generic data (GNEEdgeData, GNELaneData...)
         MEANDATA =          1 << 29, // Mean datas
         // other
-        SYMBOL =            1 << 30, // Symbol elements (VSSSymbols, RerouterSymbols...)
-        INTERNALLANE =      1 << 31, // Internal Lane
+        INTERNALLANE =      1 << 30, // Internal Lane
     };
 
+    /// @brief general tag properties
     enum TagProperty {
-        NOTDRAWABLE =               1 << 0,     // Element cannot be drawn in view
-        CLOSESHAPE =                1 << 1,     // Element can close their shape
-        GEOSHAPE =                  1 << 2,     // Element's shape acn be defined using a GEO Shape
-        DIALOG =                    1 << 3,     // Element can be edited using a dialog (GNECalibratorDialog, GNERerouterDialog...)
-        CHILD =                     1 << 4,     // Element is child of another element and will be written in XML without id (Example: E3Entry -> E3Detector...)
-        REPARENT =                  1 << 5,     // Element can be reparent
-        NOTSELECTABLE =             1 << 6,     // Element cannot be selected
-        MASKSTARTENDPOS =           1 << 7,     // Element mask attributes StartPos and EndPos as "length" (Only used in the appropiate GNEFrame)
-        NOPARAMETERS =              1 << 8,     // Element doesn't accept parameters "key1=value1|key2=value2|...|keyN=valueN" (by default all tags supports parameters)
-        RTREE =                     1 << 9,     // Element is placed in RTREE
-        CENTERAFTERCREATION =       1 << 10,    // Camera is moved after element creation
-        REQUIRE_PROJ =              1 << 11,    // Element require a geo-projection defined in network
-        VCLASS_ICON =               1 << 12,    // Element returns icon depending of their vClass
+        NO_PROPERTY =           1 << 0,     // Element doesn't have properties
+        NOTDRAWABLE =           1 << 1,     // Element cannot be drawn in view
+        CLOSESHAPE =            1 << 2,     // Element can close their shape
+        GEOSHAPE =              1 << 3,     // Element's shape acn be defined using a GEO Shape
+        DIALOG =                1 << 4,     // Element can be edited using a dialog (GNECalibratorDialog, GNERerouterDialog...)
+        CHILD =                 1 << 5,     // Element is child of another element and will be written in XML without id (Example: E3Entry -> E3Detector...)
+        REPARENT =              1 << 6,     // Element can be reparent
+        NOTSELECTABLE =         1 << 7,     // Element cannot be selected
+        MASKSTARTENDPOS =       1 << 8,     // Element mask attributes StartPos and EndPos as "length" (Only used in the appropiate GNEFrame)
+        NOPARAMETERS =          1 << 9,     // Element doesn't accept parameters "key1=value1|key2=value2|...|keyN=valueN" (by default all tags supports parameters)
+        RTREE =                 1 << 10,     // Element is placed in RTREE
+        CENTERAFTERCREATION =   1 << 11,    // Camera is moved after element creation
+        REQUIRE_PROJ =          1 << 12,    // Element require a geo-projection defined in network
+        VCLASS_ICON =           1 << 13,    // Element returns icon depending of their vClass
+        SYMBOL =                1 << 14,    // Symbol elements (VSSSymbols, RerouterSymbols...)
     };
 
+    /// @brief tag parents
     enum TagParents {
+        NO_PARENTS =                1 << 0,     // No parents
         // exclusive of vehicles
-        VEHICLE_ROUTE =             1 << 0,     // Vehicle is placed over route
-        VEHICLE_ROUTE_EMBEDDED =    1 << 1,     // Vehicle has an embedded route
-        VEHICLE_EDGES =             1 << 2,     // Vehicle is placed over a from-to edges
-        VEHICLE_JUNCTIONS =         1 << 3,     // Vehicle is placed over a from-to junctions
-        VEHICLE_TAZS =              1 << 4,     // Vehicle is placed over a from-to TAZs
+        VEHICLE_ROUTE =             1 << 1,     // Vehicle is placed over route
+        VEHICLE_ROUTE_EMBEDDED =    1 << 2,     // Vehicle has an embedded route
+        VEHICLE_EDGES =             1 << 3,     // Vehicle is placed over a from-to edges
+        VEHICLE_JUNCTIONS =         1 << 4,     // Vehicle is placed over a from-to junctions
+        VEHICLE_TAZS =              1 << 5,     // Vehicle is placed over a from-to TAZs
         // exclusive of plans
-        PLAN_CONSECUTIVE_EDGES =    1 << 5,     // Plan placed in consecutive edges
-        PLAN_ROUTE =                1 << 6,     // Plan placed in route
-        PLAN_EDGE =                 1 << 7,     // Plan placed in edge
-        PLAN_BUSSTOP =              1 << 8,     // Plan placed in busStop
-        PLAN_TRAINSTOP =            1 << 9,     // Plan placed in trainStop
-        PLAN_CONTAINERSTOP =        1 << 10,    // Plan placed in containerStop
-        PLAN_FROM_EDGE =            1 << 11,    // Plan starts in edge
-        PLAN_FROM_TAZ =             1 << 12,    // Plan starts in TAZ
-        PLAN_FROM_JUNCTION =        1 << 13,    // Plan starts in junction
-        PLAN_FROM_BUSSTOP =         1 << 14,    // Plan starts in busStop
-        PLAN_FROM_TRAINSTOP =       1 << 15,    // Plan starts in trainStop
-        PLAN_FROM_CONTAINERSTOP =   1 << 16,    // Plan starts in containerStop
-        PLAN_TO_EDGE =              1 << 17,    // Plan ends in edge
-        PLAN_TO_TAZ =               1 << 18,    // Plan ends in TAZ
-        PLAN_TO_JUNCTION =          1 << 19,    // Plan ends in junction
-        PLAN_TO_BUSSTOP =           1 << 20,    // Plan ends in busStop
-        PLAN_TO_TRAINSTOP =         1 << 21,    // Plan ends in trainStop
-        PLAN_TO_CONTAINERSTOP =     1 << 22,    // Plan ends in containerStop
+        PLAN_CONSECUTIVE_EDGES =    1 << 6,     // Plan placed in consecutive edges
+        PLAN_ROUTE =                1 << 7,     // Plan placed in route
+        PLAN_EDGE =                 1 << 8,     // Plan placed in edge
+        PLAN_BUSSTOP =              1 << 9,     // Plan placed in busStop
+        PLAN_TRAINSTOP =            1 << 10,    // Plan placed in trainStop
+        PLAN_CONTAINERSTOP =        1 << 11,    // Plan placed in containerStop
+        PLAN_FROM_EDGE =            1 << 12,    // Plan starts in edge
+        PLAN_FROM_TAZ =             1 << 13,    // Plan starts in TAZ
+        PLAN_FROM_JUNCTION =        1 << 14,    // Plan starts in junction
+        PLAN_FROM_BUSSTOP =         1 << 15,    // Plan starts in busStop
+        PLAN_FROM_TRAINSTOP =       1 << 16,    // Plan starts in trainStop
+        PLAN_FROM_CONTAINERSTOP =   1 << 17,    // Plan starts in containerStop
+        PLAN_TO_EDGE =              1 << 18,    // Plan ends in edge
+        PLAN_TO_TAZ =               1 << 19,    // Plan ends in TAZ
+        PLAN_TO_JUNCTION =          1 << 20,    // Plan ends in junction
+        PLAN_TO_BUSSTOP =           1 << 21,    // Plan ends in busStop
+        PLAN_TO_TRAINSTOP =         1 << 22,    // Plan ends in trainStop
+        PLAN_TO_CONTAINERSTOP =     1 << 23,    // Plan ends in containerStop
+    };
+
+    // @brief conflicts
+    enum Conflicts {
+        NO_CONFLICTS =              1 << 0,     // Element doesn't have conflicts
+        POS_LANE =                  1 << 1,     // Position over lane isn't valid
+        POS_LANE_START =            1 << 2,     // Start position over lane isn't valid
+        POS_LANE_END =              1 << 3,     // End position over lane isn't valid
+        NO_ADDITIONAL_CHILDREN =    1 << 4,     // Element doesn't have additional children
     };
 
     /// @brief default constructor
     GNETagProperties();
 
     /// @brief parameter constructor
-    GNETagProperties(const SumoXMLTag tag, const int tagType, const int tagProperty, const int tagParents, const GUIIcon icon,
-                     const SumoXMLTag XMLTag, const std::string tooltip, std::vector<SumoXMLTag> parentTags = {},
+    GNETagProperties(const SumoXMLTag tag, const int tagType, const int tagProperty, const int tagParents, const int conflicts,
+                     const GUIIcon icon, const SumoXMLTag XMLTag, const std::string tooltip, std::vector<SumoXMLTag> parentTags = {},
                      const unsigned int backgroundColor = FXRGBA(255, 255, 255, 255), const std::string fieldString = "");
 
     /// @brief destructor
@@ -453,13 +467,16 @@ private:
     std::string myTagStr;
 
     /// @brief tag Types
-    int myTagType = 0;
+    int myTagType = -1;
 
     /// @brief tag properties
-    int myTagProperty = 0;
+    int myTagProperty = -1;
 
     /// @brief tag parents
-    int myTagParents = 0;
+    int myTagParents = -1;
+
+    /// @brief conflicts
+    int myConflicts = -1;
 
     /// @brief vector with the attribute values vinculated with this Tag
     std::vector<GNEAttributeProperties> myAttributeProperties;
@@ -484,4 +501,3 @@ private:
 };
 
 /****************************************************************************/
-

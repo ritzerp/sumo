@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2016-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2016-2024 German Aerospace Center (DLR) and others.
 // PHEMlight module
 // Copyright (C) 2016-2023 Technische Universitaet Graz, https://www.tugraz.at/
 // This program and the accompanying materials are made available under the
@@ -298,7 +298,7 @@ namespace PHEMlightdllV5 {
         std::vector<double> emissionCurve;
         std::vector<double> powerPattern;
 
-        // bisection search to find correct position in power pattern	
+        // bisection search to find correct position in power pattern
         int upperIndex;
         int lowerIndex;
 
@@ -443,7 +443,7 @@ namespace PHEMlightdllV5 {
                 _fCHC = 0.825;
         }
         else {
-                VehicleClass->setErrMsg(std::string("The propolsion type is not known! (") + getFuelType() + std::string(")"));
+                VehicleClass->setErrMsg(std::string("The propulsion type is not known! (") + getFuelType() + std::string(")"));
                 return false;
         }
         return true;
@@ -509,7 +509,7 @@ namespace PHEMlightdllV5 {
             return;
         }
 
-        // bisection search to find correct position in power pattern	
+        // bisection search to find correct position in power pattern
         int middleIndex = ((int)pattern.size() - 1) / 2;
         upperIndex = (int)pattern.size() - 1;
         lowerIndex = 0;

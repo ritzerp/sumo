@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2013-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2013-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -193,13 +193,13 @@ std::string
 MSDevice_ToC::getOutputFilename(const SUMOVehicle& v, const OptionsCont& oc) {
     // Default of "" means no output
     std::string file = "";
-    if (v.getParameter().knowsParameter("device.toc.file")) {
+    if (v.getParameter().hasParameter("device.toc.file")) {
         try {
             file = v.getParameter().getParameter("device.toc.file", file);
         } catch (...) {
             WRITE_WARNINGF(TL("Invalid value '%' for vehicle parameter 'ssm.measures'"), v.getParameter().getParameter("device.toc.file", file));
         }
-    } else if (v.getVehicleType().getParameter().knowsParameter("device.toc.file")) {
+    } else if (v.getVehicleType().getParameter().hasParameter("device.toc.file")) {
         try {
             file = v.getVehicleType().getParameter().getParameter("device.toc.file", file);
         } catch (...) {

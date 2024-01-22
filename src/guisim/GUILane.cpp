@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -539,7 +539,7 @@ GUILane::drawGL(const GUIVisualizationSettings& s) const {
     }
     const bool hasRailSignal = myEdge->getToJunction()->getType() == SumoXMLNodeType::RAIL_SIGNAL;
     const bool detailZoom = s.scale * exaggeration > 5;
-    const bool drawDetails = (detailZoom || s.junctionSize.minSize == 0 || hasRailSignal) && !s.drawForPositionSelection;
+    const bool drawDetails = (detailZoom || s.junctionSize.minSize == 0 || hasRailSignal);
     const bool drawRails = drawAsRailway(s);
     if (isCrossing || isWalkingArea) {
         // draw internal lanes on top of junctions
@@ -619,12 +619,14 @@ GUILane::drawGL(const GUIVisualizationSettings& s) const {
                     glTranslated(0, 0, .1);
                     GLHelper::drawBoxLines(shape, getShapeRotations(s2), getShapeLengths(s2), halfInnerFeetWidth);
                     setColor(s);
-                    GLHelper::drawCrossTies(shape, getShapeRotations(s2), getShapeLengths(s2), 0.26 * exaggeration, 0.6 * exaggeration, halfCrossTieWidth, s.drawForPositionSelection);
+                    GLHelper::drawCrossTies(shape, getShapeRotations(s2), getShapeLengths(s2), 0.26 * exaggeration, 0.6 * exaggeration,
+                                            halfCrossTieWidth, 0, s.forceDrawForRectangleSelection);
                 }
             } else if (isCrossing) {
                 if (s.drawCrossingsAndWalkingareas && (s.scale > 3.0 || s.junctionSize.minSize == 0)) {
                     glTranslated(0, 0, .2);
-                    GLHelper::drawCrossTies(baseShape, getShapeRotations(s2), getShapeLengths(s2), 0.5, 1.0, getWidth() * 0.5, s.drawForPositionSelection);
+                    GLHelper::drawCrossTies(baseShape, getShapeRotations(s2), getShapeLengths(s2), 0.5, 1.0, getWidth() * 0.5,
+                                            0, s.drawForRectangleSelection);
                     glTranslated(0, 0, -.2);
                 }
             } else if (isWalkingArea) {
@@ -671,7 +673,7 @@ GUILane::drawGL(const GUIVisualizationSettings& s) const {
                 GLHelper::debugVertices(baseShape, s.geometryIndices, s.scale);
             }
             // draw details
-            if ((!isInternal || isCrossing || !s.drawJunctionShape) && (drawDetails || s.drawForPositionSelection || junctionExaggeration > 1)) {
+            if ((!isInternal || isCrossing || !s.drawJunctionShape) && (drawDetails || junctionExaggeration > 1)) {
                 GLHelper::pushMatrix();
                 glTranslated(0, 0, GLO_JUNCTION); // must draw on top of junction shape
                 glTranslated(0, 0, .5);
@@ -729,9 +731,8 @@ GUILane::drawGL(const GUIVisualizationSettings& s) const {
                 }
                 GLHelper::popMatrix();
                 // make sure link rules are drawn so tls can be selected via right-click
-                if (s.showLinkRules && (drawDetails || s.drawForPositionSelection)
-                        && !isWalkingArea
-                        && (!myEdge->isInternal() || (getLinkCont().size() > 0 && getLinkCont()[0]->isInternalJunctionLink()))) {
+                if (s.showLinkRules && drawDetails && !isWalkingArea &&
+                        (!myEdge->isInternal() || (getLinkCont().size() > 0 && getLinkCont()[0]->isInternalJunctionLink()))) {
                     GLHelper::pushMatrix();
                     glTranslated(0, 0, GLO_SHAPE); // must draw on top of junction shape and additionals
                     drawLinkRules(s, *net);
@@ -1178,12 +1179,12 @@ GUILane::setFunctionalColor(const GUIColorer& c, RGBColor& col, int activeScheme
             col = c.getScheme().getColor(0);
             std::vector<RGBColor> tazColors;
             for (MSEdge* e : myEdge->getPredecessors()) {
-                if (e->isTazConnector() && e->knowsParameter("tazColor")) {
+                if (e->isTazConnector() && e->hasParameter("tazColor")) {
                     tazColors.push_back(RGBColor::parseColor(e->getParameter("tazColor")));
                 }
             }
             for (MSEdge* e : myEdge->getSuccessors()) {
-                if (e->isTazConnector() && e->knowsParameter("tazColor")) {
+                if (e->isTazConnector() && e->hasParameter("tazColor")) {
                     tazColors.push_back(RGBColor::parseColor(e->getParameter("tazColor")));
                 }
             }
@@ -1351,7 +1352,7 @@ GUILane::getColorValue(const GUIVisualizationSettings& s, int activeScheme) cons
             return getPendingEmits();
         case 31: {
             // by numerical edge param value
-            if (myEdge->knowsParameter(s.edgeParam)) {
+            if (myEdge->hasParameter(s.edgeParam)) {
                 try {
                     return StringUtils::toDouble(myEdge->getParameter(s.edgeParam, "0"));
                 } catch (NumberFormatException&) {
@@ -1367,7 +1368,7 @@ GUILane::getColorValue(const GUIVisualizationSettings& s, int activeScheme) cons
         }
         case 32: {
             // by numerical lane param value
-            if (knowsParameter(s.laneParam)) {
+            if (hasParameter(s.laneParam)) {
                 try {
                     return StringUtils::toDouble(getParameter(s.laneParam, "0"));
                 } catch (NumberFormatException&) {
@@ -1497,13 +1498,13 @@ GUILane::getScaleValue(const GUIVisualizationSettings& s, int activeScheme, bool
 
 bool
 GUILane::drawAsRailway(const GUIVisualizationSettings& s) const {
-    return isRailway(myPermissions) && ((myPermissions & SVC_BUS) == 0) && s.showRails && (!s.drawForPositionSelection || s.spreadSuperposed);
+    return isRailway(myPermissions) && ((myPermissions & SVC_BUS) == 0) && s.showRails && s.spreadSuperposed;
 }
 
 
 bool
 GUILane::drawAsWaterway(const GUIVisualizationSettings& s) const {
-    return isWaterway(myPermissions) && s.showRails && !s.drawForPositionSelection; // reusing the showRails setting
+    return isWaterway(myPermissions) && s.showRails; // reusing the showRails setting
 }
 
 

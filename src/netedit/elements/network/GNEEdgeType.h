@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -111,6 +111,9 @@ public:
     /// @brief check if draw select contour (blue)
     bool checkDrawSelectContour() const;
 
+    /// @brief check if draw move contour (red)
+    bool checkDrawMoveContour() const;
+
     /// @}
 
     /// @name Functions related with move elements
@@ -132,6 +135,9 @@ public:
      * @see GUIGlObject::getPopUpMenu
      */
     GUIGLObjectPopupMenu* getPopUpMenu(GUIMainWindow& app, GUISUMOAbstractView& parent);
+
+    /// @brief Returns the boundary to which the view shall be centered in order to show the object
+    Boundary getCenteringBoundary() const;
 
     /// @brief update centering boundary (implies change in RTREE)
     void updateCenteringBoundary(const bool updateGrid);
@@ -170,6 +176,11 @@ public:
      * @return true if the value is valid, false in other case
      */
     bool isValid(SumoXMLAttr key, const std::string& value);
+
+    /* @brief method for check if the value for certain attribute is set
+     * @param[in] key The attribute key
+     */
+    bool isAttributeEnabled(SumoXMLAttr key) const;
 
     /// @}
 

@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -196,9 +196,9 @@ void
 RORouteHandler::myStartElement(int element,
                                const SUMOSAXAttributes& attrs) {
     try {
-        if (myActivePlan != nullptr && myActivePlan->empty() && myVehicleParameter->departProcedure == DepartDefinition::TRIGGERED && element != SUMO_TAG_RIDE) {
+        if (myActivePlan != nullptr && myActivePlan->empty() && myVehicleParameter->departProcedure == DepartDefinition::TRIGGERED && element != SUMO_TAG_RIDE && element != SUMO_TAG_PARAM) {
             throw ProcessError(TLF("Triggered departure for person '%' requires starting with a ride.", myVehicleParameter->id));
-        } else if (myActiveContainerPlan != nullptr && myActiveContainerPlanSize == 0 && myVehicleParameter->departProcedure == DepartDefinition::TRIGGERED && element != SUMO_TAG_TRANSPORT) {
+        } else if (myActiveContainerPlan != nullptr && myActiveContainerPlanSize == 0 && myVehicleParameter->departProcedure == DepartDefinition::TRIGGERED && element != SUMO_TAG_TRANSPORT && element != SUMO_TAG_PARAM) {
             throw ProcessError(TLF("Triggered departure for container '%' requires starting with a transport.", myVehicleParameter->id));
         }
         SUMORouteHandler::myStartElement(element, attrs);
@@ -728,7 +728,7 @@ RORouteHandler::closeContainer() {
         checkLastDepart();
         registerLastDepart();
     } else {
-        WRITE_WARNINGF(TL("Discarding container '%' because it's plan is empty"), myVehicleParameter->id);
+        WRITE_WARNINGF(TL("Discarding container '%' because its plan is empty"), myVehicleParameter->id);
     }
     delete myVehicleParameter;
     myVehicleParameter = nullptr;
@@ -745,7 +745,7 @@ void RORouteHandler::closeContainerFlow() {
         checkLastDepart();
         registerLastDepart();
     } else {
-        WRITE_WARNINGF(TL("Discarding containerFlow '%' because it's plan is empty"), myVehicleParameter->id);
+        WRITE_WARNINGF(TL("Discarding containerFlow '%' because its plan is empty"), myVehicleParameter->id);
     }
     delete myVehicleParameter;
     myVehicleParameter = nullptr;
@@ -1289,6 +1289,7 @@ RORouteHandler::addPersonTrip(const SUMOSAXAttributes& attrs) {
         const std::string originStopID = myActivePlan->empty() ?  "" : myActivePlan->back()->getStopDest();
         ROPerson::addTrip(*myActivePlan, myVehicleParameter->id, from, to, modeSet, types,
                           departPos, originStopID, arrivalPos, busStopID, walkFactor, group);
+        myParamStack.push_back(myActivePlan->back());
     }
 }
 
@@ -1333,6 +1334,7 @@ RORouteHandler::addWalk(const SUMOSAXAttributes& attrs) {
         retrieveStoppingPlace(attrs, errorSuffix, stoppingPlaceID);
         if (ok) {
             ROPerson::addWalk(*myActivePlan, myActiveRoute, duration, speed, departPos, arrivalPos, stoppingPlaceID);
+            myParamStack.push_back(myActivePlan->back());
         }
     } else {
         addPersonTrip(attrs);

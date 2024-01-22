@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-# Copyright (C) 2008-2023 German Aerospace Center (DLR) and others.
+# Copyright (C) 2008-2024 German Aerospace Center (DLR) and others.
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License 2.0 which is available at
 # https://www.eclipse.org/legal/epl-2.0/
@@ -92,7 +92,7 @@ def addGenericOptions(argParser):
                            help="Restrict edgeData measurements to the given vehicle types")
     argParser.add_argument("-7", "--zip", action="store_true",
                            default=False, help="zip old iterations using 7zip")
-    argParser.add_argument("-MSA", "--method-of-successive-average", action="store_true", dest="MSA",
+    argParser.add_argument("-s", "--method-of-successive-average", action="store_true", dest="MSA",
                            default=False, help="apply the method of successive average as the swapping algorithm")
 
 

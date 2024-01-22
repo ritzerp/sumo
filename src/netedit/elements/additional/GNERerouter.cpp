@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -37,6 +37,7 @@ GNERerouter::GNERerouter(GNENet* net) :
 {}, {}, {}, {}, {}, {}),
 myProbability(0),
 myOff(false),
+myOptional(false),
 myTimeThreshold(0) {
     // reset default values
     resetDefaultValues();
@@ -44,7 +45,7 @@ myTimeThreshold(0) {
 
 
 GNERerouter::GNERerouter(const std::string& id, GNENet* net, const Position& pos, const std::string& name,
-                         double probability, bool off, SUMOTime timeThreshold, const std::vector<std::string>& vTypes,
+                         double probability, bool off, bool optional, SUMOTime timeThreshold, const std::vector<std::string>& vTypes,
                          const Parameterised::Map& parameters) :
     GNEAdditional(id, net, GLO_REROUTER, SUMO_TAG_REROUTER, GUIIconSubSys::getIcon(GUIIcon::REROUTER), name,
 {}, {}, {}, {}, {}, {}),
@@ -52,6 +53,7 @@ Parameterised(parameters),
 myPosition(pos),
 myProbability(probability),
 myOff(off),
+myOptional(optional),
 myTimeThreshold(timeThreshold),
 myVTypes(vTypes) {
     // update centering boundary without updating grid
@@ -84,6 +86,9 @@ GNERerouter::writeAdditional(OutputDevice& device) const {
     if (myOff) {
         device.writeAttr(SUMO_ATTR_OFF, myOff);
     }
+    if (myOptional) {
+        device.writeAttr(SUMO_ATTR_OPTIONAL, myOptional);
+    }
     // write all rerouter interval
     for (const auto& rerouterInterval : getChildAdditionals()) {
         if (!rerouterInterval->getTagProperty().isSymbol()) {
@@ -110,6 +115,21 @@ std::string GNERerouter::getAdditionalProblem() const {
 void
 GNERerouter::fixAdditionalProblem() {
     // nothing to fix
+}
+
+
+bool
+GNERerouter::checkDrawMoveContour() const {
+    // get edit modes
+    const auto& editModes = myNet->getViewNet()->getEditModes();
+    // check if we're in move mode
+    if (!myNet->getViewNet()->isMovingElement() && editModes.isCurrentSupermodeNetwork() &&
+            (editModes.networkEditMode == NetworkEditMode::NETWORK_MOVE) && myNet->getViewNet()->checkOverLockedElement(this, mySelected)) {
+        // only move the first element
+        return myNet->getViewNet()->getViewObjectsSelector().getGUIGlObjectFront() == this;
+    } else {
+        return false;
+    }
 }
 
 
@@ -150,19 +170,21 @@ GNERerouter::updateCenteringBoundary(const bool updateGrid) {
     updateGeometry();
     // add shape boundary
     myAdditionalBoundary = myAdditionalGeometry.getShape().getBoxBoundary();
-    // add positions of all childrens (intervals and symbols)
-    for (const auto& additionalChildren : getChildAdditionals()) {
-        myAdditionalBoundary.add(additionalChildren->getPositionInView());
-        for (const auto& rerouterElement : additionalChildren->getChildAdditionals()) {
-            myAdditionalBoundary.add(rerouterElement->getPositionInView());
-            // special case for parking area rerouter
-            if (rerouterElement->getTagProperty().getTag() == SUMO_TAG_PARKING_AREA_REROUTE) {
-                myAdditionalBoundary.add(rerouterElement->getParentAdditionals().at(1)->getPositionInView());
+    /*
+        // add positions of all childrens (intervals and symbols)
+        for (const auto& additionalChildren : getChildAdditionals()) {
+            myAdditionalBoundary.add(additionalChildren->getPositionInView());
+            for (const auto& rerouterElement : additionalChildren->getChildAdditionals()) {
+                myAdditionalBoundary.add(rerouterElement->getPositionInView());
+                // special case for parking area rerouter
+                if (rerouterElement->getTagProperty().getTag() == SUMO_TAG_PARKING_AREA_REROUTE) {
+                    myAdditionalBoundary.add(rerouterElement->getParentAdditionals().at(1)->getCenteringBoundary());
+                }
             }
         }
-    }
+    */
     // grow
-    myAdditionalBoundary.grow(10);
+    myAdditionalBoundary.grow(5);
     // add additional into RTREE again
     if (updateGrid) {
         myNet->addGLObjectIntoGrid(this);

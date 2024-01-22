@@ -32,7 +32,7 @@ vehicle types).
     <th class="tg-dr3j">v<sub>max</sub> maxSpeed</th>
     <th class="tg-dr3j">v<sub>desMax</sub> desiredMaxSpeed</th>
     <th class="tg-dr3j">seats</th>
-    <th class="tg-dr3j"><a href="Models/Emissions/HBEFA3-based.html">emissionClass (HBEFA3)</a></th>
+    <th class="tg-dr3j"><a href="Models/Emissions/HBEFA3-based.md">emissionClass (HBEFA3)</a></th>
     <th class="tg-dr3j">speed deviation</th>
   </tr>
   <tr>
@@ -42,7 +42,7 @@ vehicle types).
     <td class="tg-0lax">0.215m<sup>(1)</sup><br>0.478m<sup>(1)</sup><br>1.719m<sup>(1)</sup></td>
     <td class="tg-0lax">0.25m</td>
     <td class="tg-0lax">1.5m/s<sup>2(23)</sup></td>
-    <td class="tg-0lax">2m/s<sup>2(23)</sup></td>    
+    <td class="tg-0lax">2m/s<sup>2(23)</sup></td>
     <td class="tg-0lax">5m/s<sup>2</sup></td>
     <td class="tg-0lax">37.58km/h<sup>(41)</sup></td>
     <td class="tg-0lax">5km/h<sup>(23)</sup></td>
@@ -415,7 +415,7 @@ vehicle types).
     <td class="tg-0lax">1.5m<sup>(39)</sup></td>
     <td class="tg-0lax">2m/s<sup>2(39)</sup></td>
     <td class="tg-0lax">4m/s<sup>2(39)</sup></td>
-    <td class="tg-0lax">7m/s<sup>(*)</sup></td>    
+    <td class="tg-0lax">7m/s<sup>(*)</sup></td>
     <td class="tg-0lax">20 km/h<sup>(39)</sup></td>
     <td class="tg-0lax">not limited (1e4km/h)</td>
     <td class="tg-0lax">1<sup>(*)</sup></td>
@@ -455,7 +455,7 @@ vehicle types).
 - (10): <https://www.neoplan-bus.com/cms/media/de/content/downloads/skyliner/NEOPLAN_SKYLINER.pdf>
 - (11): <https://de.wikipedia.org/wiki/DBAG-Baureihe_425>
 - (12): <https://de.wikipedia.org/wiki/ICE_3>
-- (14): <https://www.truck.man.eu/man/media/de/content_medien/doc/business_website_truck_master_1/einsatzgebiete/de_2/man-lkw-tg-fernverkehr-volumen.pdf>
+- (14): `https://www.truck.man.eu/man/media/de/content_medien/doc/business_website_truck_master_1/einsatzgebiete/de_2/man-lkw-tg-fernverkehr-volumen.pdf` (dead link)
 - (15): <https://de.wikipedia.org/wiki/Opel_Vivaro>
 - (16): <https://de.wikipedia.org/wiki/Renault_Espace>
 - (17): Fußgeher- und Fahrradverkehr: Planungsprinzipien; Hermann Knoflacher; Böhlau Verlag Wien, 1995
@@ -469,7 +469,7 @@ vehicle types).
 - (25): <https://de.wikipedia.org/wiki/Vespa_LX>
 - (26): <https://www.colliseum.net/wiki/Bremsversuche_mit_dem_Kleinkraftrad_S_50_/_S_51>
 - (27): <https://web.archive.org/web/20120622045505/https://www.unfallaufnahme.info/uebersichten-listen-und-tabellen/geschwindigkeiten-und-bremswege/index.html>
-- (28): <https://www.bmw-motorrad.de/>
+- (28): <https://de.wikipedia.org/wiki/BMW_R_1200_GS_K25>
 - (29): <https://web.archive.org/web/20140227232934/https://www.volkswagen.de/de/models/golf_7/trimlevel_overview.s9_trimlevel_detail.suffix.html/der-golf-cup~2Fcup.html>
 - (30): <https://web.archive.org/web/20160320031009/https://www.buchbinder.de/de/fahrzeuge.html>
 - (31): <https://www.colliseum.net/wiki/Lkw-Anfahrbeschleunigungswerte_f%C3%BCr_die_Praxis>

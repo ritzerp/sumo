@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -179,7 +179,8 @@ protected:
             myChangeForward(CHANGE_YES),
             myChangeBackward(CHANGE_YES),
             myLayer(0), // layer is non-zero only in conflict areas
-            myCurrentIsRoad(false)
+            myCurrentIsRoad(false),
+            myAmInRoundabout(false)
         { }
 
         virtual ~Edge() {}
@@ -238,6 +239,8 @@ protected:
         std::vector<long long int> myCurrentNodes;
         /// @brief Information whether this is a road
         bool myCurrentIsRoad;
+        /// @brief Information whether this road is part of a roundabout
+        bool myAmInRoundabout;
         /// @brief Additionally tagged information
         std::map<std::string, std::string> myExtraTags;
         /// @brief turning direction (arrows printed on the road)

@@ -7,6 +7,17 @@ title: ChangeLog
 ### Bugfixes
 
 ### Enhancements
+- netedit
+  - Now sidewalk and bikelane width can be edited in in GNECreateEdgeFrame. #9725
+  - Added new netedit option --ignore-missing-inputs. #12395
+  - Add color legend in person and container modes. #13139
+  - Now netedit checks if repeated routed are valid before saving. #13503
+  - Disable stopOffsetException row if stopOffset is 0. #14065
+  - General optimización of netedit for big networks. #13894
+  - Added red contour to moved elements. #14109
+
+- Other
+  - The "build" directory has been renamed to "build_config" to allow "build" to be used for build outputs.
 
 ### Miscellaneous
 
@@ -33,14 +44,14 @@ title: ChangeLog
     - Fixed invalid bidi-leader identification during lane changing. #13572, #13576
     - Fixed invalid collision warning on bidi lane. #13573
     - Fixed failure to change lane on internal bidi lane. #13575
-  - Speeds imposed by variable speed signs (VSS) or TraCI limit the edge type speeds (vehicles will respect the edge type speed if lower than VSS one) #13665, #13652
+  - Speeds imposed by variable speed signs (VSS) or TraCI limit the edge type speeds (vehicles will respect the edge type speed if lower than VSS one). #13665, #13652
   - Corrected speed calculation for induction loop with length > 0. #13669
-  - another fix for leader distance in ACC model #13681
-  - proper normalization when using distributions of vType distributions #13786
-  - fixed rerouting problems with numerical instabilities at the current stop #13835
+  - another fix for leader distance in ACC model. #13681
+  - proper normalization when using distributions of vType distributions. #13786
+  - fixed rerouting problems with numerical instabilities at the current stop. #13835
   - SSM output
-    - fixed wrongly classified collissions #13918
-    - fixed problems with the device after state loading #13924
+    - fixed wrongly classified collisions. #13918
+    - fixed problems with the device after state loading. #13924
 
 - netedit
   - Fixed problem saving person flow attributes. #11022
@@ -59,13 +70,13 @@ title: ChangeLog
   - Fixed crash in netedit due to netbuild / connections. #13731
   - "Press F5" message now updates earlier. #13912
   - Fixed vehicle class selection ignoring user input. #13943
-  
+
 - sumo-gui
   - Context menu uses same screen as sumo-gui on Windows. #13674
-  - Sidewalks are no longer connected to the ground in 3D view. Issue #13993
-  - The time detection for breakpoints now works with different languages and is not triggered by arbitrary numbers. Issue #14003
-  - Opening a sumo config in netedit from sumo-gui now works with special characters in paths on Windows. Issue #14005, #13768
-  - 3D models can be loaded as decals again. Issue #14009
+  - Sidewalks are no longer connected to the ground in 3D view. #13993
+  - The time detection for breakpoints now works with different languages and is not triggered by arbitrary numbers. #14003
+  - Opening a sumo config in netedit from sumo-gui now works with special characters in paths on Windows. #14005, #13768
+  - 3D models can be loaded as decals again. #14009
 
 - netconvert
   - Fixed unequal length of bidi edge. #13569
@@ -85,16 +96,16 @@ title: ChangeLog
   - traceExporter.py: kepler-JSON now generates correct timestamps. #13522, #13550
   - duaIterate.py: fixed corner case with empty output file after first iteration. #13840
   - mapDetectors.py: can now handles multiple lanes with the same distance. #13845
-  - fixed index in sumolib.net.node.Node.forbids #13857
+  - fixed index in sumolib.net.node.Node.forbids. #13857
   - osmWebWizard.py: Fixed error when requesting an amount of 0 vehicles for a mode. #13947, #13787
   - convert_detectors2SUMO.py: Syntax error fixed which made the script unusable. #13650
-  - gtfs2pt.py: Now writes correct route and vehicle ids with recent pandas versions #13346
-  
+  - gtfs2pt.py: Now writes correct route and vehicle ids with recent pandas versions. #13346
+
 - TraCI / Libsumo
   - traci.vehicletype.setScale is now applied to flows. #13707
   - Vehicles now do opposite lane overtaking for vehicles stopped via TraCI. #13710
   - Fixed error message about unknown edge. #13890
-  - Lanearea detector now reports for last interval if output file is not set. Issue #13966
+  - Lanearea detector now reports for last interval if output file is not set. #13966
   - Fixed memory leak in libsumo exception code. #13821
   - TRACI_VERSION is now 21 to account for the unit changes in #7277
 
@@ -294,7 +305,7 @@ title: ChangeLog
   - Function `sumolib.net.getBoxXY` now returns correct results for large networks. Issue #13320
   - When loading a tool configuration, unknown options now raise an error. Issue #13091
   - generateRailSignalConstraints.py: fixed invalid bidi constraint for trains with multiple diversionary tracks between stops. Issue #13519
-  
+
 
 ### Enhancements
 
@@ -346,7 +357,7 @@ title: ChangeLog
   - Vehicles with SSM device now permit retrieval of the minimum PPET using param `device.ssm.minPPET`. Issue #13293
   - Function `traci.vehicle.setStopParameter` and `getStopParameter` now supports optional argument `customParam=True` to work with user defined stop parameters. Issue #13365
   - vehicle and vehicletype domain now support the functions set/getBoardingDuration and set/getImpatience. When impatience is set on a vehicle it affects the dynamic impatience which gets reset on starting to drive. Calling vehicle.getImpatience now returns the dynamic impatience instead of the base value defined in the vType. Issue #10430, #13403
-  
+
 - tools
   - randomTrips.py: added options **--from-stops** and **--to-stops** to define pedestrians, personTrips and person rides from and to stops (i.e. busStop). Issue #13375
   - randomTrips.py: now issues a warning if option **--binomial** is too low for the given period. Issue #13404
@@ -388,7 +399,7 @@ title: ChangeLog
 ### Bugfixes
 
 - Simulation
- 
+
   - Fixed crash with option **--device.rerouting.threads**. Issue #12711 (regression 1.16.0)
   - Fixed collision at parallel lanes with different lengths. Issue #12590
   - Fixed crash when using option **--collision.action remove** and vehicles collide after lane changing. Issue #12583
@@ -746,14 +757,14 @@ title: ChangeLog
   - A `<split>` at pos=0 no longer ignores speed. Issue #12526
   - Distance (kilometrage) is now preserved when adding `<split>` element. Issue #12527
   - Custom edge length is now preserved when adding `<split>` element. Issue #12529
-  
+
 - polyconvert
   - Fixed invalid polygon output for some line based inputs. Issue #12161
-    
+
 - duarouter
   - Fixed crash on unknown landmark edge. Issue #12438
   - Fixed invalid routing result by routing algorithm A* / "astar" (minor difference caused by internal edge lengths). Issue #12463
-    
+
 - TraCI
   - Fixed moveToXY failure at parallel internal junction. Issue #12065
   - Foe lanes for crossings can now be retrieved. Issue #12059
@@ -782,7 +793,7 @@ title: ChangeLog
   - gtfs2pt.py: Fixed mapping of bus and tram stops in multimodal networks. Issue #11802, #11849
   - gtfs2pt.py: Output is now usable with duarouter. Issue #12333
 
-- All Applications: 
+- All Applications:
   - Fixed XML-validation error when SUMO_HOME is not set. Issue #12138 (regression in 1.15.0)
   - Fixed crash if gzipped outputfile cannot be opened. Issue #11954
 
@@ -866,7 +877,7 @@ title: ChangeLog
   - Added functions `vehicle.getLoadedIDList` and `vehicle.getTeleportingIDList` to retrieve the corresponding vehicles (some of which could not be retrieved with getIDList). Issue #2338
   - Simpla: The maximum length of a platoon can now be configured. Issue #11426
   - The JAVA bindings now facilitate casting of subscription results. Issue #8930
-  
+
 - Tools
   - osmWebWizard.py: Add checkboxes to select/deselect groups of elements in the road types tab. Issue #10692
   - runSeeds.py: Now forwarding unknown options to application call. Issue #12312

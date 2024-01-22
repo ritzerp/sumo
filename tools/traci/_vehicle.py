@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-# Copyright (C) 2011-2023 German Aerospace Center (DLR) and others.
+# Copyright (C) 2011-2024 German Aerospace Center (DLR) and others.
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License 2.0 which is available at
 # https://www.eclipse.org/legal/epl-2.0/
@@ -27,7 +27,7 @@ from __future__ import absolute_import
 import warnings
 from ._vehicletype import VTypeDomain
 from . import constants as tc
-from .exceptions import TraCIException, deprecated
+from .exceptions import TraCIException, deprecated, alias_param
 
 
 _legacyGetLeader = True
@@ -618,7 +618,7 @@ class VehicleDomain(VTypeDomain):
         """
         return self._getUniversal(tc.VAR_BEST_LANES, vehID)
 
-    def getLeader(self, vehID, dist=0.):
+    def getLeader(self, vehID, dist=100.):
         """getLeader(string, double) -> (string, double)
 
         Return the leading vehicle id together with the distance. The distance
@@ -758,13 +758,14 @@ class VehicleDomain(VTypeDomain):
         """
         return self._getUniversal(tc.VAR_NEXT_TLS, vehID)
 
-    def getJunctionFoes(self, vehID, distance):
+    @alias_param("dist", "distance")
+    def getJunctionFoes(self, vehID, dist=0.):
         """getJunctionFoes(string, double) -> complex
 
         Return list of junction foes [(foeId, egoDist, foeDist, egoExitDist, foeExitDist,
         egoLane, foeLane, egoResponse, foeResponse), ...] within the given distance to the given vehicle.
         """
-        return self._getUniversal(tc.VAR_FOES, vehID, "d", distance)
+        return self._getUniversal(tc.VAR_FOES, vehID, "d", dist)
 
     @deprecated()
     def getNextStops(self, vehID):
@@ -939,7 +940,10 @@ class VehicleDomain(VTypeDomain):
 
     def couldChangeLane(self, vehID, direction, state=None):
         """couldChangeLane(string, int) -> bool
-        Return whether the vehicle could change lanes in the specified direction
+        Return whether the vehicle could change lanes in the specified direction.
+        This reflects the state after the last try to change lanes.
+        If you want to execute changeLane as a result of the evaluation of this function
+        it is not guaranteed to work because vehicle movements occur first.
         """
         if state is None:
             state, stateTraCI = self.getLaneChangeState(vehID, direction)
@@ -951,6 +955,9 @@ class VehicleDomain(VTypeDomain):
     def wantsAndCouldChangeLane(self, vehID, direction, state=None):
         """wantsAndCouldChangeLane(string, int) -> bool
         Return whether the vehicle wants to and could change lanes in the specified direction
+        This reflects the state after the last try to change lanes.
+        If you want to execute changeLane as a result of the evaluation of this function
+        it is not guaranteed to work because vehicle movements occur first.
         """
         if state is None:
             state, stateTraCI = self.getLaneChangeState(vehID, direction)
@@ -972,14 +979,15 @@ class VehicleDomain(VTypeDomain):
         """
         return self._getUniversal(tc.VAR_ROUTING_MODE, vehID)
 
-    def getTaxiFleet(self, flag):
+    @alias_param("taxiState", "flag")
+    def getTaxiFleet(self, taxiState=0):
         """getTaxiFleet(int) -> list(string)
-        Return the list of all taxis with the given mode:
+        Return the list of all taxis with the given taxiState:
         0 : empty
         1 : pickup
         2 : occupied
         """
-        return self._getUniversal(tc.VAR_TAXI_FLEET, "", "i", flag)
+        return self._getUniversal(tc.VAR_TAXI_FLEET, "", "i", taxiState)
 
     def getLoadedIDList(self):
         """getLoadedIDList() -> list(string)
@@ -1403,19 +1411,21 @@ class VehicleDomain(VTypeDomain):
         else:
             self._setCmd(tc.VAR_HIGHLIGHT, vehID, "tcd", 2, color, size)
 
-    def setLaneChangeMode(self, vehID, lcm):
+    @alias_param("laneChangeMode", "lcm")
+    def setLaneChangeMode(self, vehID, laneChangeMode):
         """setLaneChangeMode(string, integer) -> None
 
         Sets the vehicle's lane change mode as a bitset.
         """
-        self._setCmd(tc.VAR_LANECHANGE_MODE, vehID, "i", lcm)
+        self._setCmd(tc.VAR_LANECHANGE_MODE, vehID, "i", laneChangeMode)
 
-    def setSpeedMode(self, vehID, sm):
+    @alias_param("speedMode", "sm")
+    def setSpeedMode(self, vehID, speedMode):
         """setSpeedMode(string, integer) -> None
 
         Sets the vehicle's speed mode as a bitset.
         """
-        self._setCmd(tc.VAR_SPEEDSETMODE, vehID, "i", sm)
+        self._setCmd(tc.VAR_SPEEDSETMODE, vehID, "i", speedMode)
 
     def addLegacy(self, vehID, routeID, depart=tc.DEPARTFLAG_NOW, pos=0, speed=0,
                   lane=tc.DEPARTFLAG_LANE_FIRST_ALLOWED, typeID="DEFAULT_VEHTYPE"):

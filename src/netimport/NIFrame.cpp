@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -184,7 +184,7 @@ NIFrame::fillOptions(OptionsCont& oc, bool forNetedit) {
     oc.addDescription("osm.layer-elevation", "Formats", TL("Reconstruct (relative) elevation based on layer data. Each layer is raised by FLOAT m"));
 
     oc.doRegister("osm.layer-elevation.max-grade", new Option_Float(10));
-    oc.addDescription("osm.layer-elevation.max-grade", "Formats", TL("Maximum grade threshold in % at 50km/h when reconstrucing elevation based on layer data. The value is scaled according to road speed."));
+    oc.addDescription("osm.layer-elevation.max-grade", "Formats", TL("Maximum grade threshold in % at 50km/h when reconstructing elevation based on layer data. The value is scaled according to road speed."));
 
     oc.doRegister("osm.oneway-spread-right", new Option_Bool(false));
     oc.addDescription("osm.oneway-spread-right", "Formats", TL("Whether one-way roads should be spread to the side instead of centered"));

@@ -1,15 +1,15 @@
 name: linux
 
-on: 
+on:
   push:            # run on push events
-    paths-ignore:  # but ignore everything in the docs subfolder 
+    paths-ignore:  # but ignore everything in the docs subfolder
       - 'docs/**'
     branches:
       - '**'
     tags:
       - '*'
   pull_request:    # run on pull requests
-    paths-ignore:  # but ignore everything in the docs subfolder 
+    paths-ignore:  # but ignore everything in the docs subfolder
       - 'docs/**'
   schedule:
     - cron:  '5 0 * * *'
@@ -23,7 +23,7 @@ jobs:
       matrix:
         build_type: [full, minimal]
         compiler: [gcc, clang]
-        jps_version: ['v1.0.3']
+        jps_version: ['v1.0.5']
         # include:
         #   - build_type: full
         #     jps_version: master
@@ -35,7 +35,7 @@ jobs:
       with:
         path: sumo
         fetch-depth: 0
- 
+
     - name: Fetching SUMO tags
       run: |
         cd sumo
@@ -51,7 +51,7 @@ jobs:
         sudo pip3 install texttest
 
     - name: Validate CITATION.cff
-      if: matrix.build_type == 'full' && github.repository == 'DLR-TS/sumo'
+      if: matrix.build_type == 'full' && github.repository == 'DLR-TS/sumo' && github.event_name == 'schedule' && matrix.compiler == 'gcc'
       uses: dieghernan/cff-validator@v2.3
       with:
         citation-path: sumo/CITATION.cff
@@ -72,24 +72,22 @@ jobs:
       if: matrix.build_type == 'full' && github.repository == 'DLR-TS/sumo'
       run: |
         sudo apt-get install libgeos-dev
-        mkdir jupedsim-build jupedsim-install
-        cd jupedsim-build
-        cmake -DCMAKE_INSTALL_PREFIX=$PWD/../jupedsim-install ../jupedsim
-        cmake --build . -j4 --config Release
-        cmake --install . --config Release
+        cmake -B jupedsim-build -DCMAKE_INSTALL_PREFIX=jupedsim-install jupedsim
+        cmake --build jupedsim-build -j4 --config Release
+        cmake --install jupedsim-build --config Release
 
     - name: Configuring SUMO
       run: |
-        mkdir -p sumo/cmake-build 
-        cd sumo/cmake-build 
+        mkdir -p sumo/cmake-build
+        cd sumo/cmake-build
         if [[ "${{ matrix.compiler }}" == "gcc" ]]; then export CC=gcc; export CXX=g++; fi
         if [[ "${{ matrix.compiler }}" == "clang" ]]; then export CC=clang; export CXX=clang++; fi
         if [[ "${{ matrix.build_type }}" == "full" ]]; then cmake ..; fi
-        if [[ "${{ matrix.build_type }}" == "minimal" ]]; then cmake -DFOX_CONFIG= -DPROJ_LIBRARY= -DCHECK_OPTIONAL_LIBS=OFF -DFMI=OFF ..; fi 
+        if [[ "${{ matrix.build_type }}" == "minimal" ]]; then cmake -DFOX_CONFIG= -DPROJ_LIBRARY= -DCHECK_OPTIONAL_LIBS=OFF -DFMI=OFF ..; fi
 
     - name: Building Traas
       run: |
-        cd sumo/cmake-build 
+        cd sumo/cmake-build
         make traas
 
     - name: Setting up SonarQube
@@ -132,14 +130,13 @@ jobs:
 
     - name: Compressing test results
       if: failure()
-      run: |
-        zip -r texttesttmp.zip ~/.texttest/tmp
+      run: zip -r texttesttmp.zip ~/.texttest/tmp
 
     - name: Uploading test results
       if: failure()
       uses: actions/upload-artifact@v3
       with:
-        name: texttesttmp
+        name: texttesttmp-${{ matrix.compiler }}-${{ matrix.build_type }}
         path: texttesttmp.zip
         if-no-files-found: warn
 

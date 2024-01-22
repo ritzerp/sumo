@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -26,7 +26,7 @@
 #include <netedit/frames/GNEFrame.h>
 #include <netedit/frames/GNENeteditAttributes.h>
 #include <netedit/frames/GNEPlanCreator.h>
-#include <netedit/frames/GNEPathLegendModule.h>
+#include <netedit/frames/GNEPlanCreatorLegend.h>
 #include <netedit/frames/GNETagSelector.h>
 #include <netedit/frames/GNEPlanSelector.h>
 
@@ -56,10 +56,10 @@ public:
     void hide();
 
     /**@brief add vehicle element
-     * @param objectsUnderCursor collection of objects under cursor after click over view
+     * @param viewObjects collection of objects under cursor after click over view
      * @return true if vehicle was successfully added
      */
-    bool addContainer(const GNEViewNetHelper::ObjectsUnderCursor& objectsUnderCursor);
+    bool addContainer(const GNEViewNetHelper::ViewObjectsSelector& viewObjects);
 
     /// @brief get plan creator module
     GNEPlanCreator* getPlanCreator() const;
@@ -108,11 +108,11 @@ private:
     /// @brief Netedit parameter
     GNENeteditAttributes* myNeteditAttributes;
 
-    /// @brief edge path creator (used for Walks, rides and trips)
+    /// @brief plan creator
     GNEPlanCreator* myPlanCreator;
 
-    /// @brief path legend modul
-    GNEPathLegendModule* myPathLegend;
+    /// @brief plan creator legend
+    GNEPlanCreatorLegend* myPlanCreatorLegend;
 
     /// @brief build container and return it (note: function includes a call to begin(...), but NOT a call to end(...))
     GNEDemandElement* buildContainer();

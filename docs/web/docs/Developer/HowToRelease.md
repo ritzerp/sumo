@@ -49,7 +49,7 @@ software (Veins, VSimRTI, flow etc.) at this stage.
 - check the documentation
   - update the [ChangeLog](../ChangeLog.md)
   - generate options documentation and xsd schemata for configuration files
-    using `tools/build/rebuildConfigDocsAndXsd.py`
+    using `tools/build_config/rebuildConfigDocsAndXsd.py`
 - check the internal tests (same procedure as above), especially the
   (to be) published scenarios
 - GitHub
@@ -74,12 +74,12 @@ assigned to a later milestone.
 
 All scenarios should be fixed by now.
 
-- patch the version information using `tools/build/updateReleaseInfo.py 0.13.7` and double check changes
+- patch the version information using `tools/build_config/updateReleaseInfo.py 0.13.7` and double check changes
   - in src/config.h.cmake, also the HAVE_VERSION_H macro should be disabled
   - in CMakeLists.txt
   - [in mkdocs.yml]({{Source}}docs/web/mkdocs.yml) in the **extra:** section at the end
     to update the [download links](../Downloads.md)
-  - [in sumo.metainfo.xml]({{Source}}build/package/sumo.metainfo.xml)
+  - [in sumo.metainfo.xml]({{Source}}build_config/package/sumo.metainfo.xml)
     for correct flatpak info
   - in CITATION.cff
   - commit the changes
@@ -112,12 +112,12 @@ following things need to be there:
   - windows binary distribution (zip, unzip the x64 file and run at least sumo-gui)
   - windows installer (msi, Win32 and x64, includes docs)
 - check the wheels on PyPI
-  - https://pypi.org/project/eclipse-sumo/ 
+  - https://pypi.org/project/eclipse-sumo/
   - https://pypi.org/project/libsumo/
   - https://pypi.org/project/sumolib/
   - https://pypi.org/project/traci/
   - https://pypi.org/project/libtraci/
-- check the Maven build https://ci.eclipse.org/sumo/job/SUMO%20Build%20-%20Maven%20Release/view/tags/ and ensure that the artifacts have been uploaded to:
+- check the Maven build https://ci.eclipse.org/sumo/job/sumo-build/view/tags/ and ensure that the artifacts have been uploaded to:
   - https://repo.eclipse.org/content/repositories/sumo-releases/org/eclipse/sumo/libtraci and
   - https://repo.eclipse.org/content/repositories/sumo-releases/org/eclipse/sumo/libsumo/
 

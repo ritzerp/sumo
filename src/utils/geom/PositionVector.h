@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -282,13 +282,13 @@ public:
     /// @brief get a side position of position vector using a offset
     static Position sideOffset(const Position& beg, const Position& end, const double amount);
 
-    /// @brief move position vector to side using certain ammount
+    /// @brief move position vector to side using certain amount
     void move2side(double amount, double maxExtension = 100);
 
     /// @brief move position vector to side using a custom offset for each geometry point
     void move2sideCustom(std::vector<double> amount, double maxExtension = 100);
 
-    /// @brief get angle in certain position of position vector
+    /// @brief get angle in certain position of position vector (in radians between -M_PI and M_PI)
     double angleAt2D(int pos) const;
 
     /**@brief inserts p between the two closest positions

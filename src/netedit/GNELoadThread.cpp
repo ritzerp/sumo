@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -299,6 +299,9 @@ GNELoadThread::fillOptions(OptionsCont& neteditOptions) {
     neteditOptions.doRegister("meandata-files", 'm', new Option_FileName());
     neteditOptions.addSynonyme("meandata-files", "meandata");
     neteditOptions.addDescription("meandata-files", "Input", TL("Load meanData descriptions from FILE(s)"));
+
+    neteditOptions.doRegister("ignore-missing-inputs", new Option_Bool(false));
+    neteditOptions.addDescription("ignore-missing-inputs", "Input", TL("Reset path values (additional, route, data...) after loading netedit config"));
 
     // TOPIC: Output
 

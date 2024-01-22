@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-# Copyright (C) 2009-2023 German Aerospace Center (DLR) and others.
+# Copyright (C) 2009-2024 German Aerospace Center (DLR) and others.
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License 2.0 which is available at
 # https://www.eclipse.org/legal/epl-2.0/
@@ -174,16 +174,21 @@ class junction:
 
 class edge:
     class create:
-        numLanes = 8
-        speed = 9
-        allowButton = 10
-        allow = 11
-        disallow = 12
-        spreadType = 13
-        priority = 15
-        width = 16
-        sidewalkWidth = 17
-        bikelaneWidth = 18
+        defaultShort = 3
+        disallowPedestrians = 4
+        addSidewalk = 5
+        addBikelane = 6
+        useTemplate = 7
+        numLanes = 9
+        speed = 10
+        allowButton = 11
+        allow = 12
+        disallow = 13
+        spreadType = 14
+        priority = 16
+        width = 17
+        sidewalkWidth = 18
+        bikelaneWidth = 19
 
     class createLane:
         add = 24
@@ -217,7 +222,7 @@ class edge:
         stopOffset = 21
         stopExceptionButton = 22
         stopException = 23
-        parameters = 26
+        parameters = 22
 
     class inspectSelection:
         speed = 1
@@ -237,12 +242,12 @@ class edge:
         stopOffset = 16
         stopExceptionButton = 17
         stopException = 18
-        parameters = 21
+        parameters = 17
 
     class template:
-        create = 32
-        copy = 33
-        clear = 34
+        create = 30
+        copy = 31
+        clear = 32
 
     class contextualMenu:
         splitEdge = 1
@@ -2473,12 +2478,15 @@ class stopBusStop:
         extension = 11
         triggered = 12
         expected = 14
+        join = 14
         permitted = 14
         parking = 15
         actType = 17
         tripID = 18
         line = 19
         onDemand = 20
+        jump = 21
+        split = 22
 
     class inspect:
         durationEnable = 1
@@ -2489,6 +2497,7 @@ class stopBusStop:
         extension = 4
         triggered = 5
         expected = 7
+        join = 7
         permitted = 7
         parking = 8
         actType = 10
@@ -2496,6 +2505,7 @@ class stopBusStop:
         line = 12
         onDemand = 13
         jump = 14
+        split = 15
 
     class inspectSelection:
         durationEnable = 1
@@ -2506,13 +2516,15 @@ class stopBusStop:
         extension = 6
         triggered = 7
         expected = 9
+        join = 9
         permitted = 10
-        parking = 10
-        actType = 12
-        tripID = 13
-        line = 14
-        onDemand = 15
-        jump = 16
+        parking = 11
+        actType = 13
+        tripID = 14
+        line = 15
+        onDemand = 16
+        jump = 17
+        split = 18
 
 # stop over train stop
 
@@ -2527,12 +2539,15 @@ class stopTrainStop:
         extension = 11
         triggered = 12
         expected = 14
+        join = 14
         permitted = 14
         parking = 15
         actType = 17
         tripID = 18
         line = 19
         onDemand = 20
+        jump = 21
+        split = 22
 
     class inspect:
         durationEnable = 1
@@ -2543,6 +2558,7 @@ class stopTrainStop:
         extension = 4
         triggered = 5
         expected = 7
+        join = 7
         permitted = 7
         parking = 8
         actType = 10
@@ -2550,6 +2566,7 @@ class stopTrainStop:
         line = 12
         onDemand = 13
         jump = 14
+        split = 15
 
     class inspectSelection:
         durationEnable = 1
@@ -2560,13 +2577,15 @@ class stopTrainStop:
         extension = 6
         triggered = 7
         expected = 9
+        join = 9
         permitted = 10
-        parking = 10
-        actType = 12
-        tripID = 13
-        line = 14
-        onDemand = 15
-        jump = 16
+        parking = 11
+        actType = 13
+        tripID = 14
+        line = 15
+        onDemand = 16
+        jump = 17
+        split = 18
 
 # stop over container stop
 
@@ -2581,12 +2600,15 @@ class stopContainerStop:
         extension = 11
         triggered = 12
         expected = 14
+        join = 14
         permitted = 14
         parking = 15
         actType = 17
         tripID = 18
         line = 19
         onDemand = 20
+        jump = 21
+        split = 22
 
     class inspect:
         durationEnable = 1
@@ -2597,6 +2619,7 @@ class stopContainerStop:
         extension = 4
         triggered = 5
         expected = 7
+        join = 7
         permitted = 7
         parking = 8
         actType = 10
@@ -2604,6 +2627,7 @@ class stopContainerStop:
         line = 12
         onDemand = 13
         jump = 14
+        split = 15
 
     class inspectSelection:
         durationEnable = 1
@@ -2614,13 +2638,15 @@ class stopContainerStop:
         extension = 6
         triggered = 7
         expected = 9
+        join = 9
         permitted = 10
-        parking = 10
-        actType = 12
-        tripID = 13
-        line = 14
-        onDemand = 15
-        jump = 16
+        parking = 11
+        actType = 13
+        tripID = 14
+        line = 15
+        onDemand = 16
+        jump = 17
+        split = 18
 
 # stop over charging station
 
@@ -2635,12 +2661,15 @@ class stopChargingStation:
         extension = 11
         triggered = 12
         expected = 14
+        join = 14
         permitted = 14
         parking = 15
         actType = 17
         tripID = 18
         line = 19
         onDemand = 20
+        jump = 21
+        split = 22
 
     class inspect:
         durationEnable = 1
@@ -2651,6 +2680,7 @@ class stopChargingStation:
         extension = 4
         triggered = 5
         expected = 7
+        join = 7
         permitted = 7
         parking = 8
         actType = 10
@@ -2658,6 +2688,7 @@ class stopChargingStation:
         line = 12
         onDemand = 13
         jump = 14
+        split = 15
 
     class inspectSelection:
         durationEnable = 1
@@ -2668,18 +2699,20 @@ class stopChargingStation:
         extension = 6
         triggered = 7
         expected = 9
+        join = 9
         permitted = 10
-        parking = 10
-        actType = 12
-        tripID = 13
-        line = 14
-        onDemand = 15
-        jump = 16
+        parking = 11
+        actType = 13
+        tripID = 14
+        line = 15
+        onDemand = 16
+        jump = 17
+        split = 18
 
 # stop over parkings
 
 
-class stopParking:
+class stopParkingArea:
     class create:
         durationEnable = 8
         duration = 9
@@ -2689,11 +2722,14 @@ class stopParking:
         extension = 11
         triggered = 12
         expected = 14
+        join = 14
         permitted = 14
         actType = 15
         tripID = 16
         line = 17
         onDemand = 18
+        jump = 19
+        split = 20
 
     class inspect:
         durationEnable = 1
@@ -2704,12 +2740,14 @@ class stopParking:
         extension = 4
         triggered = 5
         expected = 7
+        join = 7
         permitted = 7
         actType = 8
         tripID = 9
         line = 10
         onDemand = 11
         jump = 12
+        split = 13
 
     class inspectSelection:
         durationEnable = 1
@@ -2720,12 +2758,14 @@ class stopParking:
         extension = 6
         triggered = 7
         expected = 9
+        join = 9
         permitted = 10
         actType = 11
         tripID = 12
         line = 13
         onDemand = 14
         jump = 15
+        split = 16
 
 # stop over lane
 
@@ -2742,12 +2782,15 @@ class stopLane:
         extension = 13
         triggered = 14
         expected = 16
+        join = 16
         permitted = 16
         parking = 17
         actType = 19
         tripID = 20
         line = 21
         onDemand = 22
+        jump = 23
+        split = 24
 
     class inspect:
         lane = 1
@@ -2764,12 +2807,15 @@ class stopLane:
         extension = 10
         triggered = 11
         expected = 13
+        join = 13
         permitted = 13
         parking = 14
         actType = 16
         tripID = 17
         line = 18
         onDemand = 19
+        jump = 20
+        split = 21
 
     class inspectSelection:
         friendlyPos = 1
@@ -2782,12 +2828,15 @@ class stopLane:
         extension = 8
         triggered = 9
         expected = 11
+        join = 11
         permitted = 12
         parking = 13
         actType = 15
         tripID = 16
         line = 17
         onDemand = 18
+        jump = 19
+        split = 20
 
 # waypoint over bus stops
 
@@ -2806,6 +2855,8 @@ class waypointBusStop:
         tripID = 16
         line = 17
         speed = 18
+        jump = 19
+        split = 20
 
     class inspect:
         durationEnable = 1
@@ -2820,6 +2871,8 @@ class waypointBusStop:
         tripID = 9
         line = 10
         speed = 11
+        jump = 12
+        split = 13
 
     class inspectSelection:
         durationEnable = 1
@@ -2834,6 +2887,8 @@ class waypointBusStop:
         tripID = 11
         line = 12
         speed = 13
+        jump = 14
+        split = 15
 
 # waypoint over train stops
 
@@ -2852,6 +2907,8 @@ class waypointTrainStop:
         tripID = 16
         line = 17
         speed = 18
+        jump = 19
+        split = 20
 
     class inspect:
         durationEnable = 1
@@ -2866,6 +2923,8 @@ class waypointTrainStop:
         tripID = 9
         line = 10
         speed = 11
+        jump = 12
+        split = 13
 
     class inspectSelection:
         durationEnable = 1
@@ -2880,6 +2939,8 @@ class waypointTrainStop:
         tripID = 11
         line = 12
         speed = 13
+        jump = 14
+        split = 15
 
 # waypoint over container stops
 
@@ -2898,6 +2959,8 @@ class waypointContainerStop:
         tripID = 16
         line = 17
         speed = 18
+        jump = 19
+        split = 20
 
     class inspect:
         durationEnable = 1
@@ -2912,6 +2975,8 @@ class waypointContainerStop:
         tripID = 9
         line = 10
         speed = 11
+        jump = 12
+        split = 13
 
     class inspectSelection:
         durationEnable = 1
@@ -2926,6 +2991,8 @@ class waypointContainerStop:
         tripID = 11
         line = 12
         speed = 13
+        jump = 14
+        split = 15
 
 # waypoint over charging stations
 
@@ -2944,6 +3011,8 @@ class waypointChargingStation:
         tripID = 16
         line = 17
         speed = 18
+        jump = 19
+        split = 20
 
     class inspect:
         durationEnable = 1
@@ -2958,6 +3027,8 @@ class waypointChargingStation:
         tripID = 9
         line = 10
         speed = 11
+        jump = 12
+        split = 13
 
     class inspectSelection:
         durationEnable = 1
@@ -2972,6 +3043,8 @@ class waypointChargingStation:
         tripID = 11
         line = 12
         speed = 13
+        jump = 14
+        split = 15
 
 # waypoint over parkings
 
@@ -2989,6 +3062,8 @@ class waypointParking:
         tripID = 14
         line = 15
         speed = 16
+        jump = 17
+        split = 18
 
     class inspect:
         durationEnable = 1
@@ -3002,6 +3077,8 @@ class waypointParking:
         tripID = 7
         line = 8
         speed = 9
+        jump = 10
+        split = 11
 
     class inspectSelection:
         durationEnable = 1
@@ -3015,6 +3092,8 @@ class waypointParking:
         tripID = 9
         line = 10
         speed = 11
+        jump = 12
+        split = 13
 
 # waypoint (over lane)
 
@@ -3035,6 +3114,8 @@ class waypointLane:
         tripID = 18
         line = 19
         speed = 20
+        jump = 21
+        split = 22
 
     class inspect:
         lane = 1
@@ -3055,6 +3136,8 @@ class waypointLane:
         tripID = 15
         line = 16
         speed = 17
+        jump = 18
+        split = 19
 
     class inspectSelection:
         friendlyPos = 1
@@ -3071,6 +3154,8 @@ class waypointLane:
         tripID = 13
         line = 14
         speed = 15
+        jump = 16
+        split = 17
 
 # Person
 

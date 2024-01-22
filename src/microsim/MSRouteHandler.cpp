@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -27,9 +27,10 @@
 #include <microsim/transportables/MSTransportableControl.h>
 #include <microsim/transportables/MSPModel.h>
 #include <microsim/transportables/MSStageDriving.h>
-#include <microsim/transportables/MSStageWaiting.h>
 #include <microsim/transportables/MSStageTranship.h>
 #include <microsim/transportables/MSStageTrip.h>
+#include <microsim/transportables/MSStageWaiting.h>
+#include <microsim/transportables/MSStageWalking.h>
 #include <microsim/MSEdge.h>
 #include <microsim/MSLane.h>
 #include <microsim/MSInsertionControl.h>
@@ -49,6 +50,7 @@
 // static members
 // ===========================================================================
 SumoRNG MSRouteHandler::myParsingRNG("routehandler");
+
 
 // ===========================================================================
 // method definitions
@@ -181,7 +183,7 @@ void
 MSRouteHandler::myStartElement(int element, const SUMOSAXAttributes& attrs) {
     try {
         if (myActiveTransportablePlan != nullptr && myActiveTransportablePlan->empty() && myVehicleParameter->departProcedure == DepartDefinition::TRIGGERED
-                && element != SUMO_TAG_RIDE && element != SUMO_TAG_TRANSPORT) {
+                && element != SUMO_TAG_RIDE && element != SUMO_TAG_TRANSPORT && element != SUMO_TAG_PARAM) {
             const std::string mode = myActiveType == ObjectTypeEnum::PERSON ? "ride" : "transport";
             throw ProcessError("Triggered departure for " + myActiveTypeName + " '" + myVehicleParameter->id + "' requires starting with a " + mode + ".");
         }
@@ -1123,6 +1125,7 @@ MSRouteHandler::addRideOrTransport(const SUMOSAXAttributes& attrs, const SumoXML
         const SUMOTime intendedDepart = attrs.getOptSUMOTimeReporting(SUMO_ATTR_DEPART, nullptr, ok, -1);
         arrivalPos = SUMOVehicleParameter::interpretEdgePos(arrivalPos, to->getLength(), SUMO_ATTR_ARRIVALPOS, agent + " '" + aid + "' takes a " + mode + " to edge '" + to->getID() + "'");
         myActiveTransportablePlan->push_back(new MSStageDriving(from, to, s, arrivalPos, st.getVector(), group, intendedVeh, intendedDepart));
+        myParamStack.push_back(myActiveTransportablePlan->back());
     } catch (ProcessError&) {
         deleteActivePlanAndVehicleParameter();
         throw;
@@ -1472,6 +1475,7 @@ MSRouteHandler::addPersonTrip(const SUMOSAXAttributes& attrs) {
             myActiveTransportablePlan->push_back(new MSStageTrip(from, fromStop, to == nullptr ? &stoppingPlace->getLane().getEdge() : to,
                                                  stoppingPlace, duration, modeSet, types, speed, walkFactor, group,
                                                  departPosLat, attrs.hasAttribute(SUMO_ATTR_ARRIVALPOS), arrivalPos));
+            myParamStack.push_back(myActiveTransportablePlan->back());
             if (attrs.hasAttribute(SUMO_ATTR_ARRIVALPOS)) {
                 myActiveTransportablePlan->back()->markSet(VEHPARS_ARRIVALPOS_SET);
             }
@@ -1535,7 +1539,8 @@ MSRouteHandler::addWalk(const SUMOSAXAttributes& attrs) {
             }
             const int departLane = attrs.getOpt<int>(SUMO_ATTR_DEPARTLANE, nullptr, ok, -1);
             const double departPosLat = interpretDepartPosLat(attrs.getOpt<std::string>(SUMO_ATTR_DEPARTPOS_LAT, nullptr, ok, ""), departLane, "walk");
-            myActiveTransportablePlan->push_back(new MSPerson::MSPersonStage_Walking(myVehicleParameter->id, myActiveRoute, bs, duration, speed, departPos, arrivalPos, departPosLat, departLane, myActiveRouteID));
+            myActiveTransportablePlan->push_back(new MSStageWalking(myVehicleParameter->id, myActiveRoute, bs, duration, speed, departPos, arrivalPos, departPosLat, departLane, myActiveRouteID));
+            myParamStack.push_back(myActiveTransportablePlan->back());
             if (attrs.hasAttribute(SUMO_ATTR_ARRIVALPOS)) {
                 myActiveTransportablePlan->back()->markSet(VEHPARS_ARRIVALPOS_SET);
             }
@@ -1686,11 +1691,13 @@ MSRouteHandler::addTranship(const SUMOSAXAttributes& attrs) {
         double arrivalPos = attrs.getOpt<double>(SUMO_ATTR_ARRIVALPOS, cid.c_str(), ok,
                             cs == nullptr ? myActiveRoute.back()->getLength() : cs->getEndLanePosition());
         myActiveTransportablePlan->push_back(new MSStageTranship(myActiveRoute, cs, speed, departPos, arrivalPos));
+        myParamStack.push_back(myActiveTransportablePlan->back());
         myActiveRoute.clear();
     } catch (ProcessError&) {
         deleteActivePlanAndVehicleParameter();
         throw;
     }
 }
+
 
 /****************************************************************************/

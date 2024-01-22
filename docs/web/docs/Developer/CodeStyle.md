@@ -13,7 +13,7 @@ C++ code we use [AStyle](https://astyle.sourceforge.net/) to keep
 indentation and other whitespace usage consistent throughout the
 project. In order to make your code appear same as the original SUMO
 code use the following call to AStyle (or execute
-tools/build/checkStyle.py --fix <FILE_NAME\> before committing):
+tools/build_config/checkStyle.py --fix <FILE_NAME\> before committing):
 
 ```sh
 astyle --style=java --unpad-paren --pad-header --pad-oper --add-brackets --indent-switches --align-pointer=type -n <FILE_NAME>
@@ -100,7 +100,7 @@ extended character information use TeX or HTML notation instead.
 ## Throw-declarations
 
 - We are not using throw-declarations, see:
-  <https://www.gotw.ca/publications/mill22.htm> (thanks to Björn
+  <http://www.gotw.ca/publications/mill22.htm> (thanks to Björn
   Hendriks); we'll remove the existing ones subsequently.
 
 ## Object Handling
@@ -142,7 +142,7 @@ We try to adhere to the [PEP 8 Style
 Guide](https://www.python.org/dev/peps/pep-0008/) and use
 [autopep8](https://github.com/hhatto/autopep8) and
 [flake8](https://github.com/PyCQA/flake8) to check this. If you have
-both modules installed, you can run [tools/build/checkStyle.py
+both modules installed, you can run [tools/build_config/checkStyle.py
 <FILENAME\>](../Tools/Build.md#checkstylepy) to check this and also
 fix some of the errors. We run both tools without any special options
 except for the line length which we limit to 120.
@@ -193,7 +193,7 @@ following in mind:
 
 For further information about possible error sources and difficulties
 resulting in Python 3 compatibility see also
-<https://python3porting.com/> and
+<http://python3porting.com/> and
 <https://docs.python.org/3/howto/pyporting.html>
 
 ## Template
@@ -215,5 +215,5 @@ core.autocrlf settings of git) using [{{SUMO}}/.gitattributes](https://github.co
 - CRLF for Windows only files (".bat", ".props", ".vcxproj",
   ".filters", ...)
 
-Git has no equivalent to the svn:keywords property, so we do not use 
+Git has no equivalent to the svn:keywords property, so we do not use
 the $Id$ keyword any longer.

@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -179,10 +179,10 @@ GNEStop::writeDemandElement(OutputDevice& device) const {
         if (getParentLanes().size() > 0) {
             device.writeAttr(SUMO_ATTR_LANE, getParentLanes().front()->getID());
         }
-        if ((parametersSet & STOP_START_SET) != 0) {
+        if (startPos != INVALID_DOUBLE) {
             device.writeAttr(SUMO_ATTR_STARTPOS, startPos);
         }
-        if ((parametersSet & STOP_END_SET) != 0) {
+        if (endPos != INVALID_DOUBLE) {
             device.writeAttr(SUMO_ATTR_ENDPOS, endPos);
         }
     }
@@ -197,7 +197,7 @@ GNEStop::isDemandElementValid() const {
         return Problem::STOP_DOWNSTREAM;
     } else {
         // only Stops placed over lanes can be invalid
-        if (myTagProperty.getTag() != GNE_TAG_STOP_LANE) {
+        if (!myTagProperty.hasAttribute(SUMO_ATTR_FRIENDLY_POS)) {
             return Problem::OK;
         } else if (friendlyPos) {
             // with friendly position enabled position are "always fixed"
@@ -373,10 +373,41 @@ void
 GNEStop::drawGL(const GUIVisualizationSettings& s) const {
     // check if draw an stop for person/containers or for vehicles/routes
     if (canDrawVehicleStop()) {
-        // draw vehicle over stop
-        drawVehicleStop(s, getExaggeration(s));
-        // Draw name
-        drawName(getCenteringBoundary().getCenter(), s.scale, s.addName);
+        // get exaggeration
+        const auto exaggeration = getExaggeration(s);
+        // get lane
+        const auto& stopLane = getParentLanes().size() > 0 ? getParentLanes().front() : nullptr;
+        // get lane width
+        const double width = stopLane ? stopLane->getParentEdge()->getNBEdge()->getLaneWidth(stopLane->getIndex()) * 0.5 : exaggeration * 0.8;
+        // get detail level
+        const auto d = s.getDetailLevel(exaggeration);
+        // draw geometry only if we'rent in drawForObjectUnderCursor mode
+        if (!s.drawForViewObjectsHandler) {
+            // get color
+            const auto color = drawUsingSelectColor() ? s.colorSettings.selectedRouteColor : getColor();
+            // Add a layer matrix
+            GLHelper::pushMatrix();
+            // set Color
+            GLHelper::setColor(color);
+            // Start with the drawing of the area traslating matrix to origin
+            myNet->getViewNet()->drawTranslateFrontAttributeCarrier(this, getType());
+            // draw depending if is over lane or over stoppingP
+            if (getParentLanes().size() > 0) {
+                drawStopOverLane(s, d, color, width, exaggeration);
+            } else {
+                drawStopOverStoppingPlace(d, color, width, exaggeration);
+            }
+            // pop layer matrix
+            GLHelper::popMatrix();
+            // draw lock icon
+            GNEViewNetHelper::LockIcon::drawLockIcon(d, this, getType(), getPositionInView(), exaggeration);
+            // Draw name
+            drawName(getCenteringBoundary().getCenter(), s.scale, s.addName);
+            // draw dotted contour
+            myStopContour.drawDottedContours(s, d, this, s.dottedContourSettings.segmentWidth, true);
+        }
+        // calculate contour and draw dotted geometry
+        myStopContour.calculateContourExtrudedShape(s, d, this, myDemandElementGeometry.getShape(), width, exaggeration, true, true, 0);
     }
 }
 
@@ -442,22 +473,26 @@ GNEStop::getAttribute(SumoXMLAttr key) const {
                 return "";
             }
         case SUMO_ATTR_TRIGGERED:
-            if ((parametersSet & STOP_TRIGGER_SET) == false) {
-                return "false";
-            } else if (triggered) {
+            if (triggered) {
                 return "person";
             } else if (containerTriggered) {
                 return "container";
-            } else {
+            } else if (joinTriggered) {
                 return "join";
+            } else {
+                return "false";
             }
         case SUMO_ATTR_EXPECTED:
-            if ((parametersSet & STOP_TRIGGER_SET) == false) {
-                return "";
-            } else if (triggered) {
+            if (triggered) {
                 return toString(awaitedPersons);
             } else if (containerTriggered) {
                 return toString(awaitedContainers);
+            } else {
+                return "";
+            }
+        case SUMO_ATTR_JOIN:
+            if (joinTriggered) {
+                return join;
             } else {
                 return "";
             }
@@ -497,9 +532,17 @@ GNEStop::getAttribute(SumoXMLAttr key) const {
         case SUMO_ATTR_LANE:
             return getParentLanes().front()->getID();
         case SUMO_ATTR_STARTPOS:
-            return toString(startPos);
+            if (startPos != INVALID_DOUBLE) {
+                return toString(startPos);
+            } else {
+                return "";
+            }
         case SUMO_ATTR_ENDPOS:
-            return toString(endPos);
+            if (endPos != INVALID_DOUBLE) {
+                return toString(endPos);
+            } else {
+                return "";
+            }
         case SUMO_ATTR_FRIENDLY_POS:
             return toString(friendlyPos);
         case SUMO_ATTR_POSITION_LAT:
@@ -508,6 +551,8 @@ GNEStop::getAttribute(SumoXMLAttr key) const {
             } else {
                 return toString(posLat);
             }
+        case SUMO_ATTR_SPLIT:
+            return split;
         //
         case GNE_ATTR_SELECTED:
             return toString(isAttributeCarrierSelected());
@@ -546,15 +591,19 @@ GNEStop::getAttributeDouble(SumoXMLAttr key) const {
         case GNE_ATTR_PLAN_GEOMETRY_STARTPOS:
             if (getParentAdditionals().size() > 0) {
                 return getParentAdditionals().front()->getAttributeDouble(SUMO_ATTR_STARTPOS);
-            } else {
+            } else if (startPos != INVALID_DOUBLE) {
                 return startPos;
+            } else {
+                return 0;
             }
         case SUMO_ATTR_ENDPOS:
         case GNE_ATTR_PLAN_GEOMETRY_ENDPOS:
             if (getParentAdditionals().size() > 0) {
                 return getParentAdditionals().front()->getAttributeDouble(SUMO_ATTR_ENDPOS);
-            } else {
+            } else if (endPos != INVALID_DOUBLE) {
                 return endPos;
+            } else {
+                return getParentLanes().front()->getLaneShapeLength();
             }
         case SUMO_ATTR_INDEX: // for writting sorted
             return (double)myCreationIndex;
@@ -625,6 +674,7 @@ GNEStop::setAttribute(SumoXMLAttr key, const std::string& value, GNEUndoList* un
         case SUMO_ATTR_EXTENSION:
         case SUMO_ATTR_TRIGGERED:
         case SUMO_ATTR_EXPECTED:
+        case SUMO_ATTR_JOIN:
         case SUMO_ATTR_PERMITTED:
         case SUMO_ATTR_PARKING:
         case SUMO_ATTR_ACTTYPE:
@@ -646,6 +696,7 @@ GNEStop::setAttribute(SumoXMLAttr key, const std::string& value, GNEUndoList* un
         case SUMO_ATTR_ENDPOS:
         case SUMO_ATTR_FRIENDLY_POS:
         case SUMO_ATTR_POSITION_LAT:
+        case SUMO_ATTR_SPLIT:
         // other
         case GNE_ATTR_SELECTED:
         case GNE_ATTR_PARENT:
@@ -692,6 +743,12 @@ GNEStop::isValid(SumoXMLAttr key, const std::string& value) {
                     }
                 }
                 return true;
+            }
+        case SUMO_ATTR_JOIN:
+            if (value.empty()) {
+                return false;
+            } else {
+                return SUMOXMLDefinitions::isValidVehicleID(value);
             }
         case SUMO_ATTR_PERMITTED: {
             const std::vector<std::string> expectedValues = parse<std::vector<std::string> >(value);
@@ -757,13 +814,17 @@ GNEStop::isValid(SumoXMLAttr key, const std::string& value) {
                 return false;
             }
         case SUMO_ATTR_STARTPOS:
-            if (canParse<double>(value)) {
+            if (value.empty()) {
+                return true;
+            } else if (canParse<double>(value)) {
                 return SUMORouteHandler::isStopPosValid(parse<double>(value), endPos, getParentLanes().front()->getParentEdge()->getNBEdge()->getFinalLength(), POSITION_EPS, friendlyPos);
             } else {
                 return false;
             }
         case SUMO_ATTR_ENDPOS:
-            if (canParse<double>(value)) {
+            if (value.empty()) {
+                return true;
+            } else if (canParse<double>(value)) {
                 return SUMORouteHandler::isStopPosValid(startPos, parse<double>(value), getParentLanes().front()->getParentEdge()->getNBEdge()->getFinalLength(), POSITION_EPS, friendlyPos);
             } else {
                 return false;
@@ -775,6 +836,12 @@ GNEStop::isValid(SumoXMLAttr key, const std::string& value) {
                 return true;
             } else {
                 return canParse<double>(value);
+            }
+        case SUMO_ATTR_SPLIT:
+            if (value.empty()) {
+                return true;
+            } else {
+                return SUMOXMLDefinitions::isValidVehicleID(value);
             }
         //
         case GNE_ATTR_SELECTED:
@@ -795,8 +862,6 @@ GNEStop::enableAttribute(SumoXMLAttr key, GNEUndoList* undoList) {
         case SUMO_ATTR_DURATION:
         case SUMO_ATTR_UNTIL:
         case SUMO_ATTR_EXTENSION:
-        case SUMO_ATTR_EXPECTED:
-        case SUMO_ATTR_EXPECTED_CONTAINERS:
             undoList->add(new GNEChange_ToggleAttribute(this, key, true), true);
             break;
         default:
@@ -811,8 +876,6 @@ GNEStop::disableAttribute(SumoXMLAttr key, GNEUndoList* undoList) {
         case SUMO_ATTR_DURATION:
         case SUMO_ATTR_UNTIL:
         case SUMO_ATTR_EXTENSION:
-        case SUMO_ATTR_EXPECTED:
-        case SUMO_ATTR_EXPECTED_CONTAINERS:
             undoList->add(new GNEChange_ToggleAttribute(this, key, false), true);
             break;
         default:
@@ -838,11 +901,12 @@ GNEStop::isAttributeEnabled(SumoXMLAttr key) const {
         case SUMO_ATTR_EXTENSION:
             return (parametersSet & STOP_EXTENSION_SET) != 0;
         case SUMO_ATTR_EXPECTED:
-            return (parametersSet & STOP_TRIGGER_SET) != 0;
+            return triggered || containerTriggered;
+        case SUMO_ATTR_JOIN:
+            return joinTriggered;
         case SUMO_ATTR_PARKING:
-            if (myTagProperty.getTag() == GNE_TAG_STOP_PARKINGAREA) {
-                return false;
-            } else if (myTagProperty.getTag() == GNE_TAG_WAYPOINT_PARKINGAREA) {
+            // for stops/waypoints over parking areas, always enabled
+            if ((myTagProperty.getTag() == GNE_TAG_STOP_PARKINGAREA) || (myTagProperty.getTag() == GNE_TAG_WAYPOINT_PARKINGAREA)) {
                 return false;
             } else {
                 return true;
@@ -934,107 +998,6 @@ GNEStop::canDrawVehicleStop() const {
 }
 
 
-void
-GNEStop::drawVehicleStop(const GUIVisualizationSettings& s, const double exaggeration) const {
-    // declare value to save stop color
-    const RGBColor stopColor = drawUsingSelectColor() ? s.colorSettings.selectedRouteColor : getColor();
-    // get lane
-    const auto& stopLane = getParentLanes().size() > 0 ? getParentLanes().front() : nullptr;
-    // get lane width
-    const double width = stopLane ? stopLane->getParentEdge()->getNBEdge()->getLaneWidth(stopLane->getIndex()) * 0.5 : exaggeration * 0.8;
-    // Start drawing adding an gl identificator
-    GLHelper::pushName(getGlID());
-    // Add a layer matrix
-    GLHelper::pushMatrix();
-    // set Color
-    GLHelper::setColor(stopColor);
-    // Start with the drawing of the area traslating matrix to origin
-    myNet->getViewNet()->drawTranslateFrontAttributeCarrier(this, getType());
-    // draw depending of details
-    if (s.drawDetail(s.detailSettings.stopsDetails, exaggeration) && stopLane) {
-        // Draw top and bot lines using shape, shapeRotations, shapeLengths and value of exaggeration
-        GLHelper::drawBoxLines(myDemandElementGeometry.getShape(),
-                               myDemandElementGeometry.getShapeRotations(),
-                               myDemandElementGeometry.getShapeLengths(),
-                               exaggeration * 0.1, 0, width);
-        GLHelper::drawBoxLines(myDemandElementGeometry.getShape(),
-                               myDemandElementGeometry.getShapeRotations(),
-                               myDemandElementGeometry.getShapeLengths(),
-                               exaggeration * 0.1, 0, width * -1);
-        // Add a detail matrix
-        GLHelper::pushMatrix();
-        // move to geometry front
-        glTranslated(myDemandElementGeometry.getShape().back().x(), myDemandElementGeometry.getShape().back().y(), 0.1);
-        // rotate
-        if (myDemandElementGeometry.getShapeRotations().size() > 0) {
-            glRotated(myDemandElementGeometry.getShapeRotations().back(), 0, 0, 1);
-        }
-        // move again
-        glTranslated(0, exaggeration * 0.5, 0);
-        // draw stop front
-        GLHelper::drawBoxLine(Position(0, 0), 0, exaggeration * 0.5, width);
-        // move to "S" position
-        glTranslated(0, 1, 0.1);
-        // only draw text if isn't being drawn for selecting
-        if (s.drawForRectangleSelection) {
-            GLHelper::setColor(stopColor);
-            GLHelper::drawBoxLine(Position(0, 1), 0, 2, 1);
-        } else if (s.drawDetail(s.detailSettings.stopsText, exaggeration)) {
-            // draw "S" symbol
-            GLHelper::drawText(myTagProperty.isVehicleWaypoint() ? "W" : "S", Position(), .1, 2.8, stopColor, 180);
-            // move to subtitle position
-            glTranslated(0, 1.4, 0);
-            // draw subtitle depending of tag
-            GLHelper::drawText("lane", Position(), .1, 1, stopColor, 180);
-            // check if draw index
-            if (drawIndex()) {
-                // move to index position
-                glTranslated(-2.1, -2.4, 0);
-                glRotated(-90, 0, 0, 1);
-                // draw index
-                GLHelper::drawText(getAttribute(GNE_ATTR_STOPINDEX), Position(0, getAttributeDouble(GNE_ATTR_STOPINDEX) * -1, 0), .1, 1, stopColor, 180);
-            }
-        }
-        // pop detail matrix
-        GLHelper::popMatrix();
-        // draw geometry points
-        drawGeometryPoints(s, stopColor);
-    } else {
-        // Draw the area using shape, shapeRotations, shapeLengths and value of exaggeration taked from stoppingPlace parent
-        GUIGeometry::drawGeometry(s, myNet->getViewNet()->getPositionInformation(), myDemandElementGeometry, width);
-        // only draw text if isn't being drawn for selecting
-        if (s.drawDetail(s.detailSettings.stopsText, exaggeration) && drawIndex()) {
-            // Add a detail matrix
-            GLHelper::pushMatrix();
-            // move to geometry front
-            glTranslated(myDemandElementGeometry.getShape().back().x(), myDemandElementGeometry.getShape().back().y(), 0.1);
-            // rotate
-            if (myDemandElementGeometry.getShapeRotations().size() > 0) {
-                glRotated(myDemandElementGeometry.getShapeRotations().back(), 0, 0, 1);
-            }
-            // move to index position
-            glTranslated(-1.4, exaggeration * 0.5, 0.1);
-            glRotated(-90, 0, 0, 1);
-            // draw index
-            GLHelper::drawText(getAttribute(GNE_ATTR_STOPINDEX), Position(0, getAttributeDouble(GNE_ATTR_STOPINDEX) * -1, 0), .1, 1, stopColor, 180);
-        }
-        // pop detail matrix
-        GLHelper::popMatrix();
-    }
-    // pop layer matrix
-    GLHelper::popMatrix();
-    // Pop name
-    GLHelper::popName();
-    // draw lock icon
-    GNEViewNetHelper::LockIcon::drawLockIcon(this, getType(), getPositionInView(), exaggeration);
-    // check if mouse is over element
-    mouseWithinGeometry(myDemandElementGeometry.getShape(), width);
-    // draw dotted geometry
-    myContour.drawDottedContourExtruded(s, myDemandElementGeometry.getShape(), width, exaggeration, true, true,
-                                        s.dottedContourSettings.segmentWidth);
-}
-
-
 bool
 GNEStop::drawIndex() const {
     // get stop frame
@@ -1046,6 +1009,85 @@ GNEStop::drawIndex() const {
         return true;
     } else {
         return false;
+    }
+}
+
+
+
+void
+GNEStop::drawStopOverLane(const GUIVisualizationSettings& s, const GUIVisualizationSettings::Detail d, const RGBColor& color,
+                          const double width, const double exaggeration) const {
+    // Draw top and bot lines using shape, shapeRotations, shapeLengths and value of exaggeration
+    GLHelper::drawBoxLines(myDemandElementGeometry.getShape(),
+                           myDemandElementGeometry.getShapeRotations(),
+                           myDemandElementGeometry.getShapeLengths(),
+                           exaggeration * 0.1, 0, width);
+    GLHelper::drawBoxLines(myDemandElementGeometry.getShape(),
+                           myDemandElementGeometry.getShapeRotations(),
+                           myDemandElementGeometry.getShapeLengths(),
+                           exaggeration * 0.1, 0, width * -1);
+    // Add a detail matrix
+    GLHelper::pushMatrix();
+    // move to geometry front
+    glTranslated(myDemandElementGeometry.getShape().back().x(), myDemandElementGeometry.getShape().back().y(), 0.1);
+    // rotate
+    if (myDemandElementGeometry.getShapeRotations().size() > 0) {
+        glRotated(myDemandElementGeometry.getShapeRotations().back(), 0, 0, 1);
+    }
+    // move again
+    glTranslated(0, exaggeration * 0.5, 0);
+    // draw stop front
+    GLHelper::drawBoxLine(Position(0, 0), 0, exaggeration * 0.5, width);
+    // move to symbol position
+    glTranslated(0, 1, 0.1);
+    // draw text depending of detail
+    if (d <= GUIVisualizationSettings::Detail::Text) {
+        // draw symbol
+        GLHelper::drawText(myTagProperty.isVehicleWaypoint() ? "W" : "S", Position(), .1, 2.8, color, 180);
+        // move to subtitle position
+        glTranslated(0, 1.4, 0);
+        // draw subtitle depending of tag
+        GLHelper::drawText("lane", Position(), .1, 1, color, 180);
+        // check if draw index
+        if (drawIndex()) {
+            // move to index position
+            glTranslated(-2.1, -2.4, 0);
+            glRotated(-90, 0, 0, 1);
+            // draw index
+            GLHelper::drawText(getAttribute(GNE_ATTR_STOPINDEX), Position(0, getAttributeDouble(GNE_ATTR_STOPINDEX) * -1, 0), .1, 1, color, 180);
+        }
+    } else {
+        GLHelper::drawBoxLine(Position(0, 1), 0, 2, 1);
+    }
+    // pop detail matrix
+    GLHelper::popMatrix();
+    // draw geometry points
+    drawGeometryPoints(s, d, color);
+}
+
+
+void
+GNEStop::drawStopOverStoppingPlace(const GUIVisualizationSettings::Detail d, const RGBColor& color,
+                                   const double width, const double exaggeration) const {
+    // Draw the area using shape, shapeRotations, shapeLengths and value of exaggeration taked from stoppingPlace parent
+    GUIGeometry::drawGeometry(d, myDemandElementGeometry, width);
+    // only draw text if isn't being drawn for selecting
+    if ((d <= GUIVisualizationSettings::Detail::Text) && drawIndex()) {
+        // Add a detail matrix
+        GLHelper::pushMatrix();
+        // move to geometry front
+        glTranslated(myDemandElementGeometry.getShape().back().x(), myDemandElementGeometry.getShape().back().y(), 0.1);
+        // rotate
+        if (myDemandElementGeometry.getShapeRotations().size() > 0) {
+            glRotated(myDemandElementGeometry.getShapeRotations().back(), 0, 0, 1);
+        }
+        // move to index position
+        glTranslated(-1.4, exaggeration * 0.5, 0.1);
+        glRotated(-90, 0, 0, 1);
+        // draw index
+        GLHelper::drawText(getAttribute(GNE_ATTR_STOPINDEX), Position(0, getAttributeDouble(GNE_ATTR_STOPINDEX) * -1, 0), .1, 1, color, 180);
+        // pop detail matrix
+        GLHelper::popMatrix();
     }
 }
 
@@ -1092,7 +1134,7 @@ GNEStop::setAttribute(SumoXMLAttr key, const std::string& value) {
             parametersSet &= ~STOP_CONTAINER_TRIGGER_SET;
             parametersSet &= ~STOP_EXPECTED_CONTAINERS_SET;
             // check value
-            if (value == "person") {
+            if ((value == "person") || (value == "true")) {
                 parametersSet |= STOP_TRIGGER_SET;
                 triggered = true;
                 if (awaitedPersons.size() > 0) {
@@ -1124,6 +1166,16 @@ GNEStop::setAttribute(SumoXMLAttr key, const std::string& value) {
                     parametersSet |= STOP_EXPECTED_CONTAINERS_SET;
                 } else {
                     parametersSet &= ~STOP_EXPECTED_CONTAINERS_SET;
+                }
+            }
+            break;
+        case SUMO_ATTR_JOIN:
+            if (joinTriggered) {
+                join = value;
+                if (join.size() > 0) {
+                    parametersSet |= STOP_JOIN_SET;
+                } else {
+                    parametersSet &= ~STOP_JOIN_SET;
                 }
             }
             break;
@@ -1203,11 +1255,19 @@ GNEStop::setAttribute(SumoXMLAttr key, const std::string& value) {
             updateGeometry();
             break;
         case SUMO_ATTR_STARTPOS:
-            startPos = parse<double>(value);
+            if (value.empty()) {
+                startPos = INVALID_DOUBLE;
+            } else {
+                startPos = parse<double>(value);
+            }
             updateGeometry();
             break;
         case SUMO_ATTR_ENDPOS:
-            endPos = parse<double>(value);
+            if (value.empty()) {
+                endPos = INVALID_DOUBLE;
+            } else {
+                endPos = parse<double>(value);
+            }
             updateGeometry();
             break;
         case SUMO_ATTR_FRIENDLY_POS:
@@ -1220,6 +1280,14 @@ GNEStop::setAttribute(SumoXMLAttr key, const std::string& value) {
             } else {
                 posLat = parse<double>(value);
                 parametersSet |= STOP_POSLAT_SET;
+            }
+            break;
+        case SUMO_ATTR_SPLIT:
+            split = value;
+            if (split.size() > 0) {
+                parametersSet |= STOP_SPLIT_SET;
+            } else {
+                parametersSet &= ~STOP_SPLIT_SET;
             }
             break;
         //
@@ -1348,7 +1416,7 @@ GNEStop::commitMoveShape(const GNEMoveResult& moveResult, GNEUndoList* undoList)
 
 
 void
-GNEStop::drawGeometryPoints(const GUIVisualizationSettings& s, const RGBColor& baseColor) const {
+GNEStop::drawGeometryPoints(const GUIVisualizationSettings& s, const GUIVisualizationSettings::Detail d, const RGBColor& baseColor) const {
     // first check that we're in move mode and shift key is pressed
     if (myNet->getViewNet()->getEditModes().isCurrentSupermodeDemand() &&
             (myNet->getViewNet()->getEditModes().demandEditMode == DemandEditMode::DEMAND_MOVE) &&
@@ -1367,7 +1435,7 @@ GNEStop::drawGeometryPoints(const GUIVisualizationSettings& s, const RGBColor& b
             GLHelper::pushMatrix();
             glTranslated(myDemandElementGeometry.getShape().front().x(), myDemandElementGeometry.getShape().front().y(), 0.1);
             // draw geometry point
-            GLHelper::drawFilledCircle(s.neteditSizeSettings.additionalGeometryPointRadius, s.getCircleResolution());
+            GLHelper::drawFilledCircleDetailled(d, s.neteditSizeSettings.additionalGeometryPointRadius);
             // pop geometry point matrix
             GLHelper::popMatrix();
         }
@@ -1376,7 +1444,7 @@ GNEStop::drawGeometryPoints(const GUIVisualizationSettings& s, const RGBColor& b
             GLHelper::pushMatrix();
             glTranslated(myDemandElementGeometry.getShape().back().x(), myDemandElementGeometry.getShape().back().y(), 0.1);
             // draw geometry point
-            GLHelper::drawFilledCircle(s.neteditSizeSettings.additionalGeometryPointRadius, s.getCircleResolution());
+            GLHelper::drawFilledCircleDetailled(d, s.neteditSizeSettings.additionalGeometryPointRadius);
             // pop geometry point matrix
             GLHelper::popMatrix();
         }

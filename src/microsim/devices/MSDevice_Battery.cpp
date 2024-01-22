@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2013-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2013-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -80,7 +80,7 @@ double
 MSDevice_Battery::readParameterValue(SUMOVehicle& v, const SumoXMLAttr& attr, const std::string& paramName, double defaultVal) {
     const std::string& oldParam = toString(attr);
     const SUMOVTypeParameter& typeParams = v.getVehicleType().getParameter();
-    if (v.getParameter().knowsParameter(oldParam) || typeParams.knowsParameter(oldParam)) {
+    if (v.getParameter().hasParameter(oldParam) || typeParams.hasParameter(oldParam)) {
         WRITE_WARNINGF(TL("Battery device in vehicle '%s' still uses old parameter '%'. Please update to 'device.%'."), v.getID(), oldParam, paramName);
         if (v.getParameter().getParameter(oldParam, "-") == "-") {
             return typeParams.getDouble(oldParam, defaultVal);

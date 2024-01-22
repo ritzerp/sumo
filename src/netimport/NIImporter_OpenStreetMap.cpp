@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -266,6 +266,10 @@ NIImporter_OpenStreetMap::load(const OptionsCont& oc, NBNetBuilder& nb) {
         insertEdge(e, running, currentFrom, last, passed, nb, first, last);
     }
 
+    /* Collect edges which explictly are part of a roundabout and store the edges of each
+     * detected roundabout */
+    nb.getEdgeCont().extractRoundabouts();
+
     if (myImportCrossings) {
         /* After edges are instantiated
          * nodes are parsed again to add pedestrian crossings to them
@@ -274,7 +278,7 @@ NIImporter_OpenStreetMap::load(const OptionsCont& oc, NBNetBuilder& nb) {
 
         for (const auto& nodeIt : nc) {
             NBNode* const n = nodeIt.second;
-            if (n->knowsParameter("computePedestrianCrossing")) {
+            if (n->hasParameter("computePedestrianCrossing")) {
                 EdgeVector incomingEdges = n->getIncomingEdges();
                 EdgeVector outgoingEdges = n->getOutgoingEdges();
                 size_t incomingEdgesNo = incomingEdges.size();
@@ -743,8 +747,18 @@ NIImporter_OpenStreetMap::insertEdge(Edge* e, int index, NBNode* from, NBNode* t
                     || (myImportSidewalks && (sidewalkType & WAY_FORWARD) != 0 && defaultPermissions != SVC_PEDESTRIAN)) {
                 nbe->addSidewalk(sidewalkWidth * offsetFactor);
             }
+            if (!addBackward && (e->myExtraAllowed & SVC_PEDESTRIAN) != 0 && (nbe->getPermissions(0) & SVC_PEDESTRIAN) == 0) {
+                // Pedestrians are explicitly allowed (maybe through foot="yes") but did not get a sidewalk (maybe through sidewalk="no").
+                // Since we do not have a backward edge, we need to make sure they can at least walk somewhere, see #14124
+                nbe->setPermissions(nbe->getPermissions(0) | SVC_PEDESTRIAN, 0);
+            }
             nbe->updateParameters(e->getParametersMap());
             nbe->setDistance(distanceStart);
+            if (e->myAmInRoundabout) {
+                // ensure roundabout edges have the precedence
+                nbe->setJunctionPriority(to, NBEdge::JunctionPriority::ROUNDABOUT);
+                nbe->setJunctionPriority(from, NBEdge::JunctionPriority::ROUNDABOUT);
+            }
 
             // process forward lanes width
             const int numForwardLanesFromWidthKey = (int)e->myWidthLanesForward.size();
@@ -791,7 +805,11 @@ NIImporter_OpenStreetMap::insertEdge(Edge* e, int index, NBNode* from, NBNode* t
             }
             nbe->updateParameters(e->getParametersMap());
             nbe->setDistance(distanceEnd);
-
+            if (e->myAmInRoundabout) {
+                // ensure roundabout edges have the precedence
+                nbe->setJunctionPriority(from, NBEdge::JunctionPriority::ROUNDABOUT);
+                nbe->setJunctionPriority(to, NBEdge::JunctionPriority::ROUNDABOUT);
+            }
             // process backward lanes width
             const int numBackwardLanesFromWidthKey = (int)e->myWidthLanesBackward.size();
             if (numBackwardLanesFromWidthKey > 0) {
@@ -1416,6 +1434,9 @@ NIImporter_OpenStreetMap::EdgesHandler::myStartElement(int element, const SUMOSA
         } else if (key == "junction") {
             if ((value == "roundabout" || value == "circular") && myCurrentEdge->myIsOneWay.empty()) {
                 myCurrentEdge->myIsOneWay = "yes";
+            }
+            if (value == "roundabout") {
+                myCurrentEdge->myAmInRoundabout = true;
             }
         } else if (key == "oneway") {
             myCurrentEdge->myIsOneWay = value;

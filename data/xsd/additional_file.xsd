@@ -102,6 +102,12 @@
                                 <xsd:attribute name="visible" type="boolType"/>
                             </xsd:complexType>
                         </xsd:element>
+                        <xsd:element name="viaProbReroute">
+                            <xsd:complexType>
+                                <xsd:attribute name="id" type="idType" use="required"/>
+                                <xsd:attribute name="probability" type="nonNegativeFloatType"/>
+                            </xsd:complexType>
+                        </xsd:element>
                     </xsd:choice>
                     <xsd:attribute name="begin" type="nonNegativeFloatType" use="required"/>
                     <xsd:attribute name="end" type="nonNegativeFloatType" use="required"/>
@@ -227,7 +233,7 @@
                         <xsd:restriction base="xsd:string">
                             <xsd:enumeration value="defaults"/>
                         </xsd:restriction>
-                    </xsd:simpleType> 
+                    </xsd:simpleType>
                 </xsd:union>
             </xsd:simpleType>
         </xsd:attribute>
@@ -352,6 +358,12 @@
                                 <xsd:attribute name="visible" type="boolType"/>
                             </xsd:complexType>
                         </xsd:element>
+                        <xsd:element name="viaProbReroute">
+                            <xsd:complexType>
+                                <xsd:attribute name="id" type="idType" use="required"/>
+                                <xsd:attribute name="probability" type="nonNegativeFloatType"/>
+                            </xsd:complexType>
+                        </xsd:element>
                     </xsd:choice>
                     <xsd:attribute name="begin" type="nonNegativeFloatType" use="required"/>
                     <xsd:attribute name="end" type="nonNegativeFloatType" use="required"/>
@@ -366,7 +378,8 @@
         <xsd:attribute name="pos" type="xsd:string" use="optional"/>
         <xsd:attribute name="name" type="xsd:string" use="optional"/>
         <xsd:attribute name="visible" type="boolType" use="optional"/>
-		<xsd:attribute name="off" type="boolType" use="optional"/>
+        <xsd:attribute name="off" type="boolType" use="optional"/>
+        <xsd:attribute name="optional" type="boolType" use="optional"/>
     </xsd:complexType>
 
     <xsd:complexType name="instantInductionLoopType">
@@ -400,7 +413,7 @@
         <xsd:attribute name="personCapacity" type="nonNegativeIntType" use="optional"/>
         <xsd:attribute name="parkingLength" type="nonNegativeFloatType" use="optional"/>
     </xsd:complexType>
-    
+
     <xsd:complexType name="containerStopType">
         <xsd:sequence>
             <xsd:element name="param" type="paramType" minOccurs="0" maxOccurs="unbounded"/>
@@ -416,7 +429,7 @@
         <xsd:attribute name="containerCapacity" type="nonNegativeIntType" use="optional"/>
         <xsd:attribute name="parkingLength" type="nonNegativeFloatType" use="optional"/>
     </xsd:complexType>
-    
+
     <xsd:complexType name="chargingStationType">
         <xsd:sequence>
             <xsd:element name="param" type="paramType" minOccurs="0" maxOccurs="unbounded"/>
@@ -491,6 +504,7 @@
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
                     <xsd:enumeration value="random"/>
+                    <xsd:enumeration value="doors"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>

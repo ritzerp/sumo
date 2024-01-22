@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2002-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2002-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -72,14 +72,17 @@ StringBijection<int>::Entry SUMOXMLDefinitions::tags[] = {
     { "calibratorLane",                         GNE_TAG_CALIBRATOR_LANE },
     { "calibratorFlow",                         GNE_TAG_CALIBRATOR_FLOW },
     { "rerouter",                               SUMO_TAG_REROUTER },
+    { "rerouterSymbol",                         GNE_TAG_REROUTER_SYMBOL },
     { "interval",                               SUMO_TAG_INTERVAL },
     { "destProbReroute",                        SUMO_TAG_DEST_PROB_REROUTE },
     { "closingReroute",                         SUMO_TAG_CLOSING_REROUTE },
     { "closingLaneReroute",                     SUMO_TAG_CLOSING_LANE_REROUTE },
     { "routeProbReroute",                       SUMO_TAG_ROUTE_PROB_REROUTE },
     { "parkingAreaReroute",                     SUMO_TAG_PARKING_AREA_REROUTE },
+    { "viaProbReroute",                         SUMO_TAG_VIA_PROB_REROUTE },
     { "step",                                   SUMO_TAG_STEP },
     { "variableSpeedSign",                      SUMO_TAG_VSS },
+    { "variableSpeedSignSymbol",                GNE_TAG_VSS_SYMBOL },
     { "vaporizer",                              SUMO_TAG_VAPORIZER },
     { "tractionSubstation",                     SUMO_TAG_TRACTION_SUBSTATION },
     { "overheadWireSegment",                    SUMO_TAG_OVERHEAD_WIRE_SEGMENT },   // <- Deprecate
@@ -261,8 +264,6 @@ StringBijection<int>::Entry SUMOXMLDefinitions::tags[] = {
     { "poiGeo",                                 GNE_TAG_POIGEO },
     { "jps.walkableArea",                       GNE_TAG_JPS_WALKABLEAREA },
     { "jps.obstacle",                           GNE_TAG_JPS_OBSTACLE },
-    { "rerouterSymbol",                         GNE_TAG_REROUTER_SYMBOL },
-    { "variableSpeedSignSymbol",                GNE_TAG_VSS_SYMBOL },
     { "flowRoute",                              GNE_TAG_FLOW_ROUTE },
     { "flowWithRoute",                          GNE_TAG_FLOW_WITHROUTE },
     // GNE waypoints
@@ -970,6 +971,7 @@ StringBijection<int>::Entry SUMOXMLDefinitions::attrs[] = {
     { "arrivalTime",            SUMO_ATTR_ARRIVALTIME },
     { "arrivalTimeBraking",     SUMO_ATTR_ARRIVALTIMEBRAKING },
     { "arrivalSpeedBraking",    SUMO_ATTR_ARRIVALSPEEDBRAKING },
+    { "optional",               SUMO_ATTR_OPTIONAL },
 
 #ifndef WIN32
     { "commandPosix",   SUMO_ATTR_COMMAND },
@@ -1047,6 +1049,7 @@ StringBijection<int>::Entry SUMOXMLDefinitions::attrs[] = {
     { "carriageLength",     SUMO_ATTR_CARRIAGE_LENGTH },
     { "locomotiveLength",   SUMO_ATTR_LOCOMOTIVE_LENGTH },
     { "carriageGap",        SUMO_ATTR_CARRIAGE_GAP },
+    { "carriageDoors",      SUMO_ATTR_CARRIAGE_DOORS },
 
     { "targetLanes",    SUMO_ATTR_TARGETLANE },
     { "crossing",       SUMO_ATTR_CROSSING },

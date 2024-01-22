@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -62,7 +62,9 @@ MSStageTranship::~MSStageTranship() {
 
 MSStage*
 MSStageTranship::clone() const {
-    return new MSStageTranship(myRoute, myDestinationStop, mySpeed, myDepartPos, myArrivalPos);
+    MSStage* const clon = new MSStageTranship(myRoute, myDestinationStop, mySpeed, myDepartPos, myArrivalPos);
+    clon->setParameters(*this);
+    return clon;
 }
 
 
@@ -75,10 +77,10 @@ MSStageTranship::proceed(MSNet* net, MSTransportable* transportable, SUMOTime no
     myRouteStep = myRoute.end() - 1;
     myDepartPos = previous->getEdgePos(now);
     if (transportable->isPerson()) {
-        myState = net->getPersonControl().getNonInteractingModel()->add(transportable, this, now);
+        myPState = net->getPersonControl().getNonInteractingModel()->add(transportable, this, now);
         (*myRouteStep)->addTransportable(transportable);
     } else {
-        myState = net->getContainerControl().getNonInteractingModel()->add(transportable, this, now);
+        myPState = net->getContainerControl().getNonInteractingModel()->add(transportable, this, now);
         (*myRouteStep)->addTransportable(transportable);
     }
 }

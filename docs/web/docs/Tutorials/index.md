@@ -21,7 +21,7 @@ title: Tutorials
 The SUMO User Conference is an anual event organized by the German Aerospace Center (DLR) in Berlin. Since 2015, each conference begins with a SUMO tutorial session. Below you can find the tutorial material (slide deck and input files). Since 2019, the tutorials have also been recorded on video.
 
 ## Files
-* [SUMO 2015](https://sumo.dlr.de/daily/sumo2015_tutorial.zip): network editing with xml patch, persons, 
+* [SUMO 2015](https://sumo.dlr.de/daily/sumo2015_tutorial.zip): network editing with xml patch, persons,
 * [SUMO 2016](https://sumo.dlr.de/daily/sumo2016_tutorial.zip): network editing, meso, containers, [New Features 2016 (Slides)](https://sumo.dlr.de/daily/SUMO2016_new_features.pdf)
 * [SUMO 2017](https://sumo.dlr.de/daily/sumo2017_tutorial.zip): network editing, randomTrips, calibrators (xml only), public transport (obsolete)
 * [SUMO 2018](https://sumo.dlr.de/daily/sumo2018_tutorial.zip): fixing intermodal junctions, calibrators in netedit, junction model parameters, editing shapes
@@ -66,7 +66,7 @@ These tutorials use the [Python-TraCI Library](../TraCI/Interfacing_TraCI_from_P
 # Other
 
 ## Curso de Simulação em Mobilidade
-[Udemy tutorial](https://www.udemy.com/ferramenta-de-microssimulacao-de-trafego-sumo/learn/v4/overview) in Portuguese courtesy of Ednardo Ferreira.
+[Udemy tutorial](https://www.udemy.com/course/ferramenta-de-microssimulacao-de-trafego-sumo/) in Portuguese courtesy of Ednardo Ferreira.
 
 ## ITSC 2015
 

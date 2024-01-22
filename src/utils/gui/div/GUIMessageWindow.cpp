@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2003-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2003-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -170,10 +170,10 @@ GUIMessageWindow::setCursorPos(FXint pos, FXbool notify) {
             const FXString candidate = text.mid(start, lineEnd(pos) - start);
             FXint timePos = candidate.find(TL(" time"));
             if (timePos > -1) {
-                timePos += std::string(TL(" time")).size() + 1;
+                timePos += (int)std::string(TL(" time")).size() + 1;
                 SUMOTime t = -1;
                 if (pos >= 0 && pos > start + timePos) {
-                    t = getTimeString(candidate, timePos, 0, candidate.length());
+                    t = getTimeString(candidate, timePos, 0, (int)candidate.length());
                     if (t >= 0) {
                         t += myBreakPointOffset;
                         std::vector<SUMOTime> breakpoints = myMainWindow->retrieveBreakpoints();
@@ -241,7 +241,7 @@ GUIMessageWindow::appendMsg(GUIEventType eType, const std::string& msg) {
         }
         // find time links
         pos = text.find(TL(" time"));
-        const int timeTerm = std::string(TL(" time")).size() + 1;
+        const int timeTerm = (int)std::string(TL(" time")).size() + 1;
         SUMOTime t = -1;
         if (pos >= 0) {
             t = getTimeString(text, pos + timeTerm, 0, text.length());

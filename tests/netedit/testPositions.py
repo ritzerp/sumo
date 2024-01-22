@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-# Copyright (C) 2009-2023 German Aerospace Center (DLR) and others.
+# Copyright (C) 2009-2024 German Aerospace Center (DLR) and others.
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License 2.0 which is available at
 # https://www.eclipse.org/legal/epl-2.0/
@@ -45,9 +45,17 @@ class demandElements:
         x = 450
         y = 390
 
+    class edgeRepeat0:
+        x = 110
+        y = 250
+
+    class edgeRepeat1:
+        x = 150
+        y = 250
+
     class edgeBus1:
-        x = 115
-        y = 150
+        x = 150
+        y = 220
 
     class edgeBus2:
         x = 150

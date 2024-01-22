@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -2075,18 +2075,16 @@ NBEdge::setJunctionPriority(const NBNode* const node, int prio) {
 
 double
 NBEdge::getAngleAtNode(const NBNode* const atNode) const {
-    // myStartAngle, myEndAngle are in [0,360] and this returns results in [-180,180]
     if (atNode == myFrom) {
         return GeomHelper::legacyDegree(myGeom.angleAt2D(0));
-    } else {
-        assert(atNode == myTo);
-        return GeomHelper::legacyDegree(myGeom.angleAt2D(-2));
     }
+    assert(atNode == myTo);
+    return GeomHelper::legacyDegree(myGeom.angleAt2D(-2));
 }
+
 
 double
 NBEdge::getAngleAtNodeNormalized(const NBNode* const atNode) const {
-    // myStartAngle, myEndAngle are in [0,360] and this returns results in [-180,180]
     double res;
     if (atNode == myFrom) {
         res = GeomHelper::legacyDegree(myGeom.angleAt2D(0)) - 180;
@@ -3799,7 +3797,7 @@ NBEdge::append(NBEdge* e) {
     myGeom.append(e->myGeom);
     for (int i = 0; i < (int)myLanes.size(); i++) {
         myLanes[i].customShape.append(e->myLanes[i].customShape);
-        if (myLanes[i].knowsParameter(SUMO_PARAM_ORIGID) || e->myLanes[i].knowsParameter(SUMO_PARAM_ORIGID)
+        if (myLanes[i].hasParameter(SUMO_PARAM_ORIGID) || e->myLanes[i].hasParameter(SUMO_PARAM_ORIGID)
                 || OptionsCont::getOptions().getBool("output.original-names")) {
             const std::string origID = myLanes[i].getParameter(SUMO_PARAM_ORIGID, getID());
             const std::string origID2 = e->myLanes[i].getParameter(SUMO_PARAM_ORIGID, e->getID());
@@ -3836,7 +3834,7 @@ NBEdge::append(NBEdge* e) {
     myTo = e->myTo;
     myTurnSignTarget = e->myTurnSignTarget;
     myToBorder = e->myToBorder;
-    if (e->knowsParameter("origTo")) {
+    if (e->hasParameter("origTo")) {
         setParameter("origTo", e->getParameter("origTo"));
     }
     if (e->mySignalPosition != Position::INVALID) {
@@ -4464,11 +4462,14 @@ NBEdge::addRestrictedLane(double width, SUMOVehicleClass vclass) {
     if (myLaneSpreadFunction == LaneSpreadFunction::CENTER) {
         myGeom.move2side(width / 2);
     }
-    // disallow pedestrians on all lanes to ensure that sidewalks are used and
-    // crossings can be guessed
+    // disallow the designated vclass on all "old" lanes
     disallowVehicleClass(-1, vclass);
     // don't create a restricted vehicle lane to the right of a sidewalk
     const int newIndex = (vclass != SVC_PEDESTRIAN && myLanes[0].permissions == SVC_PEDESTRIAN) ? 1 : 0;
+    if (newIndex == 0) {
+        // disallow pedestrians on all "higher" lanes to ensure that sidewalk remains the rightmost lane
+        disallowVehicleClass(-1, SVC_PEDESTRIAN);
+    }
     // add new lane
     myLanes.insert(myLanes.begin() + newIndex, Lane(this, myLanes[0].getParameter(SUMO_PARAM_ORIGID)));
     myLanes[newIndex].permissions = vclass;

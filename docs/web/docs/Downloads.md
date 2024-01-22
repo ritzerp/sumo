@@ -28,7 +28,7 @@ SUMO is also available via winget so `winget install --name sumo` should give yo
 
 ## Linux
 
-The community maintains several repositories notably at the 
+The community maintains several repositories notably at the
 [open build service](https://build.opensuse.org/project/show/science:dlr).
 For a detailed list of repositories see below.
 
@@ -67,9 +67,9 @@ repositories include a nightly build as well (called ***sumo-git***).
 - [Fedora 36 repository](https://download.opensuse.org/repositories/science:/dlr/Fedora_36/)
 - [Fedora 37 repository](https://download.opensuse.org/repositories/science:/dlr/Fedora_37/)
 - [Fedora 38 repository](https://download.opensuse.org/repositories/science:/dlr/Fedora_38/)
+- [Fedora 39 repository](https://download.opensuse.org/repositories/science:/dlr/Fedora_39/)
 - [Fedora Rawhide repository](https://download.opensuse.org/repositories/science:/dlr/Fedora_Rawhide/)
 - [CentOS 7 repository](https://download.opensuse.org/repositories/science:/dlr/CentOS_7/)
-- [CentOS 8 repository](https://download.opensuse.org/repositories/science:/dlr/CentOS_8/)
 
 ### Examples
 
@@ -101,8 +101,8 @@ Ubuntu, Debian and Arch users please see the community repositories above.
 You can read the Homebrew-based installation guide [here](Installing/index.md#macos) or follow the Build instructions [here](Installing/MacOS_Build.md).
 
 "Bottles" are available for installing with
-[Homebrew](https://brew.sh/). They are built for three of the most recent
-major macOS versions (currently Big Sur, Monterey and Ventura) and are built
+[Homebrew](https://brew.sh/). They are built for the three most recent
+macOS versions (currently Monterey, Ventura and Sonoma) and are built
 from source with minimal requirements (fox, proj, xerces-c). If you need
 optional libraries, you can specify these on the brew command line and
 brew will compile SUMO from source. For details, see the [Formula's

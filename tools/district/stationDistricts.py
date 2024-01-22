@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-# Copyright (C) 2007-2023 German Aerospace Center (DLR) and others.
+# Copyright (C) 2007-2024 German Aerospace Center (DLR) and others.
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License 2.0 which is available at
 # https://www.eclipse.org/legal/epl-2.0/
@@ -141,8 +141,8 @@ def findParallel(options, net, stations):
     for station in stations.values():
         coords = sum(station.platforms, [])
         station.coord = (
-            sum([c[0] for c in coords]) / len(coords),
-            sum([c[1] for c in coords]) / len(coords))
+            round(sum([c[0] for c in coords]) / len(coords), 3),
+            round(sum([c[1] for c in coords]) / len(coords), 3))
 
         for edge, dist in net.getNeighboringEdges(station.coord[0], station.coord[1], options.parallelRadius):
             station.edges.add(edge)

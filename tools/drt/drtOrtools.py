@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-# Copyright (C) 2021-2023 German Aerospace Center (DLR) and others.
+# Copyright (C) 2021-2024 German Aerospace Center (DLR) and others.
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License 2.0 which is available at
 # https://www.eclipse.org/legal/epl-2.0/
@@ -39,8 +39,9 @@ if 'SUMO_HOME' in os.environ:
 import sumolib  # noqa
 import traci  # noqa
 
-SPEED_DEFAULT = 20 # default vehicle speed in m/s
+SPEED_DEFAULT = 20  # default vehicle speed in m/s
 PENALTY_FACTOR = 5  # factor on penalty for rejecting requests
+
 
 class CostType(Enum):
     DISTANCE = 1
@@ -244,6 +245,39 @@ def get_penalty(sumo_config, cost_type, penalty_factor=PENALTY_FACTOR):
     dimension = get_network_dimension(sumo_config, cost_type)
     penalty = dimension * penalty_factor
     return int(penalty)
+
+def get_network_path(sumo_config):
+    """Get path to SUMO network from config file."""
+    sumo_config = pathlib.Path(sumo_config)
+    net_file = list(sumolib.xml.parse(sumo_config, "net-file"))
+    net_filename = net_file[0].getAttribute("value")
+    net_path = pathlib.Path(net_filename)
+    if net_path.is_absolute():
+        return net_path
+    else:
+        return sumo_config.parent / net_path
+
+
+def get_network_dimension(sumo_config, cost_type):
+    """Get the rough network dimension."""
+    net_path = get_network_path(sumo_config)
+    net = sumolib.net.readNet(net_path)
+    # diameter of bounding box
+    diameter = net.getBBoxDiameter()
+    if cost_type.name == "DISTANCE":
+        dimension = diameter
+    if cost_type.name == "TIME":
+        # convert distance to time assuming default speed
+        dimension = diameter / SPEED_DEFAULT
+    return dimension
+
+
+def get_penalty(sumo_config, cost_type, penalty_factor=PENALTY_FACTOR):
+    """Define penalty for rejecting requests."""
+    dimension = get_network_dimension(sumo_config, cost_type)
+    penalty = dimension * penalty_factor
+    return int(penalty)
+
 
 def get_time_windows(reservations, fleet, end):
     """returns a list of pairs with earliest and latest time"""

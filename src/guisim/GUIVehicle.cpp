@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -344,7 +344,8 @@ GUIVehicle::drawAction_drawCarriageClass(const GUIVisualizationSettings& s, bool
         carriageLengthWithGap = (length - locomotiveLength) / (numCarriages - 1);
         carriageLength = carriageLengthWithGap - carriageGap;
     }
-    const int firstPassengerCarriage = defaultLength == locomotiveLength || numCarriages == 1 || (getVClass() & SVC_RAIL_CLASSES) == 0 ? 0 : 1;
+    const int firstPassengerCarriage = defaultLength == locomotiveLength || numCarriages == 1
+                                       || (getVClass() & (SVC_RAIL_ELECTRIC | SVC_RAIL_FAST | SVC_RAIL)) == 0 ? 0 : 1;
     const int noPersonsBackCarriages = (getVehicleType().getGuiShape() == SUMOVehicleShape::TRUCK_SEMITRAILER || getVehicleType().getGuiShape() == SUMOVehicleShape::TRUCK_1TRAILER) && numCarriages > 1 ? 1 : 0;
     const int firstContainerCarriage = numCarriages == 1 || getVehicleType().getGuiShape() == SUMOVehicleShape::TRUCK_1TRAILER ? 0 : 1;
     const int seatsPerCarriage = (int)ceil(getVType().getPersonCapacity() / (numCarriages - firstPassengerCarriage - noPersonsBackCarriages));

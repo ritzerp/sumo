@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2017-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2017-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -686,7 +686,7 @@ Simulation::findIntermodalRoute(const std::string& from, const std::string& to,
         throw TraCIException("Invalid arrival position " + toString(arrivalPos) + " for edge '" + to + "'.");
     }
     double minCost = std::numeric_limits<double>::max();
-    MSNet::MSIntermodalRouter& router = MSNet::getInstance()->getIntermodalRouter(0, routingMode);
+    MSTransportableRouter& router = MSNet::getInstance()->getIntermodalRouter(0, routingMode);
     for (SUMOVehicleParameter* vehPar : pars) {
         std::vector<TraCIStage> resultCand;
         SUMOVehicle* vehicle = nullptr;
@@ -704,11 +704,11 @@ Simulation::findIntermodalRoute(const std::string& from, const std::string& to,
                 vehicle->setChosenSpeedFactor(type->getSpeedFactor().getParameter()[0]);
             }
         }
-        std::vector<MSNet::MSIntermodalRouter::TripItem> items;
+        std::vector<MSTransportableRouter::TripItem> items;
         if (router.compute(fromEdge, toEdge, departPos, "", arrivalPos, destStop,
                            speed * walkFactor, vehicle, modeSet, departStep, items, externalFactor)) {
             double cost = 0;
-            for (std::vector<MSNet::MSIntermodalRouter::TripItem>::iterator it = items.begin(); it != items.end(); ++it) {
+            for (std::vector<MSTransportableRouter::TripItem>::iterator it = items.begin(); it != items.end(); ++it) {
                 if (!it->edges.empty()) {
                     resultCand.push_back(TraCIStage((it->line == "" ? STAGE_WALKING : STAGE_DRIVING), it->vType, it->line, it->destStop));
                     for (const MSEdge* e : it->edges) {
@@ -752,7 +752,7 @@ Simulation::getParameter(const std::string& objectID, const std::string& key) {
             return toString(cs->getMyName());
         } else if (attrName == "lane") {
             return cs->getLane().getID();
-        } else if (cs->knowsParameter(attrName)) {
+        } else if (cs->hasParameter(attrName)) {
             return cs->getParameter(attrName);
         } else {
             throw TraCIException("Invalid chargingStation parameter '" + attrName + "'");
@@ -792,7 +792,7 @@ Simulation::getParameter(const std::string& objectID, const std::string& key) {
             return toString(pa->getMyName());
         } else if (attrName == "lane") {
             return pa->getLane().getID();
-        } else if (pa->knowsParameter(attrName)) {
+        } else if (pa->hasParameter(attrName)) {
             return pa->getParameter(attrName);
         } else {
             throw TraCIException("Invalid parkingArea parameter '" + attrName + "'");
@@ -807,7 +807,7 @@ Simulation::getParameter(const std::string& objectID, const std::string& key) {
             return toString(bs->getMyName());
         } else if (attrName == "lane") {
             return bs->getLane().getID();
-        } else if (bs->knowsParameter(attrName)) {
+        } else if (bs->hasParameter(attrName)) {
             return bs->getParameter(attrName);
         } else {
             throw TraCIException("Invalid busStop parameter '" + attrName + "'");
@@ -829,11 +829,11 @@ Simulation::getParameter(const std::string& objectID, const std::string& key) {
 LIBSUMO_GET_PARAMETER_WITH_KEY_IMPLEMENTATION(Simulation)
 
 void
-Simulation::setParameter(const std::string& objectID, const std::string& param, const std::string& value) {
+Simulation::setParameter(const std::string& objectID, const std::string& key, const std::string& value) {
     if (objectID == "") {
-        MSNet::getInstance()->setParameter(param, value);
+        MSNet::getInstance()->setParameter(key, value);
     } else {
-        throw TraCIException("Setting simulation parameter '" + param + "' is not supported for object id '" + objectID + "'. Use empty id for generic network parameters");
+        throw TraCIException("Setting simulation parameter '" + key + "' is not supported for object id '" + objectID + "'. Use empty id for generic network parameters");
     }
 }
 

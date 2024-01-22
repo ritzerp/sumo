@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -73,6 +73,7 @@ SUMOVTypeParameter::VClassDefaultValues::VClassDefaultValues(SUMOVehicleClass vc
     osgFile("car-normal-citrus.obj"),
     carriageLength(-1),
     locomotiveLength(-1),
+    carriageDoors(2),
     latAlignmentProcedure(LatAlignmentDefinition::CENTER) {
     // update default values
     switch (vclass) {
@@ -298,6 +299,7 @@ SUMOVTypeParameter::SUMOVTypeParameter(const std::string& vtid, const SUMOVehicl
       carriageLength(-1),
       locomotiveLength(-1),
       carriageGap(1),
+      carriageDoors(2),
       timeToTeleport(TTT_UNSET),
       timeToTeleportBidi(TTT_UNSET),
       speedFactorPremature(-1),
@@ -330,6 +332,7 @@ SUMOVTypeParameter::SUMOVTypeParameter(const std::string& vtid, const SUMOVehicl
     osgFile = defaultValues.osgFile;
     carriageLength = defaultValues.carriageLength;
     locomotiveLength = defaultValues.locomotiveLength;
+    carriageDoors = defaultValues.carriageDoors;
     latAlignmentProcedure = defaultValues.latAlignmentProcedure;
     // check if default speeddev was defined
     if (oc.exists("default.speeddev")) {
@@ -558,6 +561,13 @@ SUMOVTypeParameter::write(OutputDevice& dev) const {
         dev.writeAttr(SUMO_ATTR_VALUE, toString(carriageGap));
         dev.closeTag();
     }
+    // Write carriage doors
+    if (wasSet(VTYPEPARS_CARRIAGE_DOORS_SET)) {
+        dev.openTag(SUMO_TAG_PARAM);
+        dev.writeAttr(SUMO_ATTR_KEY, toString(SUMO_ATTR_CARRIAGE_DOORS));
+        dev.writeAttr(SUMO_ATTR_VALUE, toString(carriageDoors));
+        dev.closeTag();
+    }
     // Write rest of parameters
     writeParams(dev);
     // close tag
@@ -683,7 +693,7 @@ SUMOVTypeParameter::cacheParamRestrictions(const std::vector<std::string>& restr
 
 void
 SUMOVTypeParameter::initRailVisualizationParameters() {
-    if (knowsParameter("carriageLength")) {
+    if (hasParameter("carriageLength")) {
         carriageLength = StringUtils::toDouble(getParameter("carriageLength"));
         parametersSet |= VTYPEPARS_CARRIAGE_LENGTH_SET;
     } else {
@@ -732,17 +742,17 @@ SUMOVTypeParameter::initRailVisualizationParameters() {
                 break;
         }
     }
-    if (knowsParameter("locomotiveLength")) {
+    if (hasParameter("locomotiveLength")) {
         locomotiveLength = StringUtils::toDouble(getParameter("locomotiveLength"));
         parametersSet |= VTYPEPARS_LOCOMOTIVE_LENGTH_SET;
     } else if (locomotiveLength <= 0) {
         locomotiveLength = carriageLength;
     }
-    if (knowsParameter("carriageGap")) {
+    if (hasParameter("carriageGap")) {
         carriageGap = StringUtils::toDouble(getParameter("carriageGap"));
         parametersSet |= VTYPEPARS_CARRIAGE_GAP_SET;
     }
-    if (knowsParameter("frontSeatPos")) {
+    if (hasParameter("frontSeatPos")) {
         frontSeatPos = StringUtils::toDouble(getParameter("frontSeatPos"));
         parametersSet |= VTYPEPARS_FRONT_SEAT_POS_SET;
     } else {
@@ -776,7 +786,7 @@ SUMOVTypeParameter::initRailVisualizationParameters() {
         }
     }
 
-    if (knowsParameter("seatingWidth")) {
+    if (hasParameter("seatingWidth")) {
         seatingWidth = StringUtils::toDouble(getParameter("seatingWidth"));
         parametersSet |= VTYPEPARS_SEATING_WIDTH_SET;
     }

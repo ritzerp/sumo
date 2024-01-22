@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2001-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2001-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -58,9 +58,9 @@ GUITriggerBuilder::buildLaneSpeedTrigger(MSNet& net,
 
 MSTriggeredRerouter*
 GUITriggerBuilder::buildRerouter(MSNet& net, const std::string& id,
-                                 MSEdgeVector& edges, double prob, bool off,
-                                 SUMOTime timeThreshold, const std::string& vTypes) {
-    GUITriggeredRerouter* rr = new GUITriggeredRerouter(id, edges, prob, off, timeThreshold, vTypes,
+                                 MSEdgeVector& edges, double prob, bool off, bool optional,
+                                 SUMOTime timeThreshold, const std::string& vTypes, const Position& pos) {
+    GUITriggeredRerouter* rr = new GUITriggeredRerouter(id, edges, prob, off, optional, timeThreshold, vTypes, pos,
             dynamic_cast<GUINet&>(net).getVisualisationSpeedUp());
     return rr;
 }

@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2002-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2002-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -111,6 +111,8 @@ enum SumoXMLTag {
     GNE_TAG_CALIBRATOR_FLOW,
     /// @brief  A rerouter
     SUMO_TAG_REROUTER,
+    /// @brief Rerouter Symbol
+    GNE_TAG_REROUTER_SYMBOL,
     /// @brief an aggreagated-output interval
     SUMO_TAG_INTERVAL,
     /// @brief probability of destination of a reroute
@@ -123,8 +125,12 @@ enum SumoXMLTag {
     SUMO_TAG_ROUTE_PROB_REROUTE,
     /// @brief entry for an alternative parking zone
     SUMO_TAG_PARKING_AREA_REROUTE,
+    /// @brief probability of a via fora reroute
+    SUMO_TAG_VIA_PROB_REROUTE,
     /// @brief A variable speed sign
     SUMO_TAG_VSS,
+    /// @brief VSS Symbol
+    GNE_TAG_VSS_SYMBOL,
     /// @brief trigger: a step description
     SUMO_TAG_STEP,
     /// @brief vaporizer of vehicles
@@ -423,10 +429,6 @@ enum SumoXMLTag {
     GNE_TAG_JPS_WALKABLEAREA,
     /// @brief polygon used for draw juPedSim obstacles
     GNE_TAG_JPS_OBSTACLE,
-    /// @brief Rerouter Symbol
-    GNE_TAG_REROUTER_SYMBOL,
-    /// @brief VSS Symbol
-    GNE_TAG_VSS_SYMBOL,
     /// @brief COF Symbol
     GNE_TAG_COF_SYMBOL,
     /// @brief a flow definition using a route instead of a from-to edges route
@@ -1344,6 +1346,7 @@ enum SumoXMLAttr {
     SUMO_ATTR_ARRIVALTIME,
     SUMO_ATTR_ARRIVALTIMEBRAKING,
     SUMO_ATTR_ARRIVALSPEEDBRAKING,
+    SUMO_ATTR_OPTIONAL,
 
     /// @name ActivityGen Tags
     /// @{
@@ -1506,6 +1509,7 @@ enum SumoXMLAttr {
     SUMO_ATTR_CARRIAGE_LENGTH,
     SUMO_ATTR_LOCOMOTIVE_LENGTH,
     SUMO_ATTR_CARRIAGE_GAP,
+    SUMO_ATTR_CARRIAGE_DOORS,
     /// @}
 
     SUMO_ATTR_TARGETLANE,

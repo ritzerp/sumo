@@ -1,6 +1,6 @@
 /****************************************************************************/
 // Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.dev/sumo
-// Copyright (C) 2017-2023 German Aerospace Center (DLR) and others.
+// Copyright (C) 2017-2024 German Aerospace Center (DLR) and others.
 // This program and the accompanying materials are made available under the
 // terms of the Eclipse Public License 2.0 which is available at
 // https://www.eclipse.org/legal/epl-2.0/
@@ -48,8 +48,7 @@ NamedRTree* POI::myTree(nullptr);
 std::vector<std::string>
 POI::getIDList() {
     std::vector<std::string> ids;
-    ShapeContainer& shapeCont = MSNet::getInstance()->getShapeContainer();
-    shapeCont.getPOIs().insertIDs(ids);
+    MSNet::getInstance()->getShapeContainer().getPOIs().insertIDs(ids);
     return ids;
 }
 
@@ -112,8 +111,8 @@ LIBSUMO_GET_PARAMETER_WITH_KEY_IMPLEMENTATION(POI)
 
 
 void
-POI::setType(const std::string& poiID, const std::string& type) {
-    getPoI(poiID)->setShapeType(type);
+POI::setType(const std::string& poiID, const std::string& poiType) {
+    getPoI(poiID)->setShapeType(poiType);
 }
 
 
